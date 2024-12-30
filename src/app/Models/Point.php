@@ -9,5 +9,9 @@ class Point extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'calc_config' => 'array'
+    ];
+
     // Redeemable scope
 }

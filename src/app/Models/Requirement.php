@@ -4,10 +4,13 @@ namespace App\Models;
 
 use App\Casts\MoneyCast;
 use App\Enum\RequirementStatus;
+use App\Observers\RequirementObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+#[ObservedBy([RequirementObserver::class])]
 class Requirement extends Model
 {
     use HasFactory, SoftDeletes;
@@ -34,9 +37,12 @@ class Requirement extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function canBeEditedBy(User $user): bool{
-        return $this->status === RequirementStatus::PENDING || $user->id === $this->admin_id;
+    public function project(){
+        return $this->belongsTo(Project::class);
     }
-    
+
+    public function point(){
+        return $this->hasOne(Point::class);
+    }
 
 }

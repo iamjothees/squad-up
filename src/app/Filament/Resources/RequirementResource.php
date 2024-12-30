@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\User\Resources;
+namespace App\Filament\Resources;
 
-use App\Filament\User\Resources\RequirementResource\Pages;
-use App\Filament\User\Resources\RequirementResource\RelationManagers;
+use App\Filament\Resources\RequirementResource\Pages;
+use App\Filament\Resources\RequirementResource\RelationManagers;
 use App\Models\Requirement;
 use App\Service\RequirementService;
 use Filament\Forms;
@@ -13,15 +13,12 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Number;
 
 class RequirementResource extends Resource
 {
     protected static ?string $model = Requirement::class;
 
-    protected static ?string $navigationIcon = 'icon-requirements';
-
-    protected static ?int $navigationSort = 1;
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {

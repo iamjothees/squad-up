@@ -14,7 +14,10 @@ return new class extends Migration
         Schema::create('points', function (Blueprint $table) {
             $table->id();
             $table->foreignId('requirement_id')->constrained('requirements');
+            $table->foreignId('owner_id')->constrained('users');
             $table->unsignedInteger('points');
+            $table->unsignedTinyInteger('participation_level')->default(1);
+            $table->json('calc_config');
             $table->timestamps();
         });
     }

@@ -26,7 +26,7 @@ class UserPanelProvider extends PanelProvider
     {
         return $panel
             ->id('user')
-            ->path('user')
+            ->domain('console.localhost')
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -59,6 +59,7 @@ class UserPanelProvider extends PanelProvider
             ->colors([
                 'primary' => '#006600',
             ])
-            ->topNavigation();
+            ->topNavigation()
+            ->databaseTransactions();
     }
 }

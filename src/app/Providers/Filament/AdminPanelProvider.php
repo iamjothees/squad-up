@@ -29,7 +29,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('admin')
+            ->domain('admin.localhost')
             ->login()
             ->colors([
                 'primary' => Color::Amber,
@@ -40,10 +40,7 @@ class AdminPanelProvider extends PanelProvider
                 Pages\Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
-            ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
-            ])
+            ->widgets([])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -59,11 +56,13 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
                 AdminAuth::class,
             ])
+            ->topNavigation()
             ->plugin(new LocalLogins())
             ->font('Roboto')
             ->defaultThemeMode(ThemeMode::Dark)
             ->colors([
                 'primary' => '#9966ff',
-            ]);
+            ])
+            ->databaseTransactions();
     }
 }

@@ -1,14 +1,11 @@
 <?php
 
-namespace App\Filament\User\Resources\RequirementResource\Pages;
+namespace App\Filament\Resources\RequirementResource\Pages;
 
-use App\Enum\RequirementStatus;
-use App\Filament\User\Resources\RequirementResource;
+use App\Filament\Resources\RequirementResource;
 use App\Service\RequirementService;
 use Filament\Actions;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
-use Illuminate\Database\Eloquent\Builder;
 
 class ListRequirements extends ListRecords
 {
