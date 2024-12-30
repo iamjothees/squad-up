@@ -1,0 +1,19 @@
+services:
+  app:
+    image: squad-up:latest
+    volumes:
+      - ./src:/var/www/html
+    ports:
+      - 5071:80
+      - 5073:5173
+  db:
+    image: mysql:8.0
+    # command: --default-authentication-plugin=mysql_native_password
+    environment:
+        MYSQL_DATABASE: squad-up
+        MYSQL_USER: squad-up
+        MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    volumes:
+        - ./dbdata:/var/lib/mysql
+    ports: 
+        - "5072:3306"
