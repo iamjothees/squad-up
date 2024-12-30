@@ -6,7 +6,6 @@
     - Requirements
     - Points
     - Redeems
-    - 
 
 # App Panel
 - Login

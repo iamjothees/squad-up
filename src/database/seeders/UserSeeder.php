@@ -24,6 +24,6 @@ class UserSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'user@test.dev',
             'password' => Hash::make('user@123'),
-        ])->assignRole('user');
+        ]);
     }
 }

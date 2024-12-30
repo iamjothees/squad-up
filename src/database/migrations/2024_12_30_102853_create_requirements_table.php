@@ -11,18 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('projects', function (Blueprint $table) {
+        Schema::create('requirements', function (Blueprint $table) {
             $table->id();
             $table->string('title');
             $table->text('description')->nullable();
             $table->foreignId('service_id')->constrained('services');
-            $table->foreignId('admin_id')->constrained('users');
-            $table->timestamp('started_at')->nullable();
-            $table->timestamp('expected_completed_at')->nullable();
-            $table->timestamp('completed_at')->nullable();
-            $table->timestamp('delivered_at')->nullable();
-            $table->unsignedInteger('committed_budget'); // in INR (paise)
-            $table->unsignedTinyInteger('priority_range')->default(1); // 1 - 10
+            $table->foreignId('owner_id')->constrained('users');
+            $table->foreignId('referer_id')->nullable()->constrained('users');
+            $table->foreignId('admin_id')->nullable()->constrained('users');
+            $table->timestamp('required_at')->nullable();
+            $table->unsignedInteger('expecting_budget'); // in INR (paise)
+            $table->string('status')->default('pending');
+            $table->foreignId('project_id')->nullable()->constrained('projects');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('projects');
+        Schema::dropIfExists('requirements');
     }
 };
