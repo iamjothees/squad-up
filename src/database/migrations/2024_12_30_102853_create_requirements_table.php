@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->foreignId('service_id')->constrained('services');
-            $table->foreignId('owner_id')->constrained('users');
+            $table->foreignId('owner_id')->nullable()->constrained('users');
             $table->foreignId('referer_id')->nullable()->constrained('users');
             $table->foreignId('admin_id')->nullable()->constrained('users');
             $table->timestamp('required_at')->nullable();

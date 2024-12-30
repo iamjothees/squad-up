@@ -31,4 +31,10 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function scopeOnlyAdmin($query){
+        return $query
+            ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+            ->where('model_has_roles.role_id', 1);
+    }
 }
