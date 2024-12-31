@@ -1,6 +1,7 @@
 # User App Panel
-- Login
-- 
+- Referal Partner code page
+- Profile
+- Points as Wallet ( UI )
 
 
 # DB Design

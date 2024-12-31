@@ -52,12 +52,10 @@ class PointService
     // TODO: points config to be DTO
     private function generatePoints(float $budget, int $participationLevel = 1, ?array $pointsConfig = null): int{
         $pointsConfig ??= app(GeneralSettings::class)->points_config;
-        // dd($budget, $participationLevel, $pointsConfig[$participationLevel]);
         $percent = collect($pointsConfig[$participationLevel] ?? [])
             ->sortBy('least')
-            
             ->firstWhere(
-                fn ($item) =>  ($item['least'] ?? 0 <= $budget) && ($budget <= $item['most'] ?? $budget) && dd($item, $budget)
+                fn ($item) =>  (($item['least'] ?? 0) <= $budget) && ($budget <= ($item['most'] ?? $budget))
             )['percent'];
     
         return $budget * $percent;

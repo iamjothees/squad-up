@@ -19,9 +19,20 @@ class RequirementService
         //
     }
 
+    public function generateReferalCode(Requirement $requirement): string{
+        return "REQ-{$requirement->id}-" . str(str()->uuid())->take(4);
+    }
+
     public function accept(Requirement $requirement): Requirement{
         $requirement->status = RequirementStatus::IN_PROGRESS;
         $requirement->admin_id = auth()->id();
+        $requirement->save();
+
+        return $requirement;    
+    }
+
+    public function reject(Requirement $requirement): Requirement{
+        $requirement->status = RequirementStatus::REJECTED;
         $requirement->save();
 
         return $requirement;    
@@ -67,7 +78,6 @@ class RequirementService
                 ->required()
                 ->preload(config('app.env') === 'local')
                 ->searchable()
-                ->columnStart(1)
                 ->visible(auth()->user()->hasRole('admin')),
             Forms\Components\Select::make('service_id')
                 ->label('Service')
@@ -75,7 +85,15 @@ class RequirementService
                 ->required()
                 ->preload()
                 ->searchable()
-                ->default(1),
+                ->default(1)
+                ->columnStart(1),
+            Forms\Components\TextInput::make('expecting_budget')
+                ->required()
+                ->hint(fn ($state) => Number::currency($state ?? 0) )
+                ->prefix('₹')
+                ->numeric()
+                ->live(onBlur: true)
+                ->minValue(0),
             Forms\Components\TextInput::make('title')
                 ->required()
                 ->maxLength(255)
@@ -88,7 +106,8 @@ class RequirementService
                 ->rules([
                     Rule::exists('users', 'referal_partner_code')
                             ->where( fn ($q) => $q->whereNot('id', auth()->id()) )
-                ]),
+                ])
+                ->visible(!auth()->user()->hasRole('admin')),
             Forms\Components\Select::make('referer_id')
                 ->label("Referer")
                 ->relationship('referer', 'name', fn (Builder $query) => $query->whereNot('id', auth()->id()) )
@@ -102,13 +121,6 @@ class RequirementService
                 ->relationship('admin', 'name', fn (Builder $query) => $query->onlyAdmins() )
                 ->preload()
                 ->searchable(),
-            Forms\Components\TextInput::make('expecting_budget')
-                ->required()
-                ->hint(fn ($state) => Number::currency($state ?? 0) )
-                ->prefix('₹')
-                ->numeric()
-                ->live(onBlur: true)
-                ->minValue(0),
             Forms\Components\DateTimePicker::make('required_at')->seconds(false),
         ];
     }
@@ -120,10 +132,12 @@ class RequirementService
                 ->searchable(),
             Tables\Columns\TextColumn::make('owner.name')
                 ->label("Owner")
+                ->description(fn ($record) => auth()->user()->hasRole('admin') ? ($record->owner?->phone ?? $record->owner?->email) : '')
                 ->visible(auth()->user()->hasRole('admin')),
             Tables\Columns\TextColumn::make('admin.name')
                 ->label("Known Team member"),
-            Tables\Columns\TextColumn::make('referer.name'),
+            Tables\Columns\TextColumn::make('referer.name')
+                ->description(fn ($record) => auth()->user()->hasRole('admin') ? ($record->referer?->phone ?? $record->referer?->email) : ''),
             Tables\Columns\TextColumn::make('required_at')
                 ->dateTime('d-m-Y h:i A'),
             Tables\Columns\TextColumn::make('expecting_budget')

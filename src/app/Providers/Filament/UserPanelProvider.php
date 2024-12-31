@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\User\Pages\Auth\Register;
 use BetterFuturesStudio\FilamentLocalLogins\LocalLogins;
 use Filament\Enums\ThemeMode;
 use Filament\Http\Middleware\Authenticate;
@@ -31,7 +32,7 @@ class UserPanelProvider extends PanelProvider
                 'primary' => Color::Amber,
             ])
             ->login()
-            ->registration()
+            ->registration(Register::class)
             ->discoverResources(in: app_path('Filament/User/Resources'), for: 'App\\Filament\\User\\Resources')
             ->discoverPages(in: app_path('Filament/User/Pages'), for: 'App\\Filament\\User\\Pages')
             ->pages([

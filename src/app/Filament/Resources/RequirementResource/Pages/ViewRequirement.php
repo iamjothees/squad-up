@@ -16,15 +16,20 @@ class ViewRequirement extends ViewRecord
 {
     protected static string $resource = RequirementResource::class;
     private Closure $handleAccept;
+    private Closure $handleReject;
     private Closure $createProject;
 
     public function __construct()
     {
         $this->handleAccept = function ($record, RequirementService $requirementService) {
             $requirementService->accept( requirement: $record);
-            Notification::make('accepted')->title('Accepted')->success()->send();
+            Notification::make('accepted')->title('Accepted')->warning()->send();
         };
 
+        $this->handleReject = function ($record, RequirementService $requirementService) {
+            $requirementService->reject( requirement: $record);
+            Notification::make('rejected')->title('Rejected')->warning()->send();
+        };
 
         $this->createProject = function ($record, RequirementService $requirementService) {
             $requirementService->createProject( requirement: $record);
@@ -37,16 +42,16 @@ class ViewRequirement extends ViewRecord
     {
         return [
             Actions\Action::make('view-project')
-                ->url(fn ($record) => ProjectResource::getUrl('view', ['record' => $record]))
+                ->url(fn ($record) => ProjectResource::getUrl('view', ['record' => $record->project_id]))
                 ->color('primary')
                 ->visible(fn (Requirement $record) => $record->project),
-            Actions\Action::make('create-project')
+            Actions\Action::make('create-project') // TODO: confirm project budget
                 ->action($this->createProject)
                 ->color('success')
                 ->outlined()
                 ->authorize(fn ($record) => auth()->user()->can('create-project', $record)),
             Actions\Action::make('reject')
-                ->label('Reject')
+                ->action($this->handleReject)
                 ->color('danger')
                 ->outlined()
                 ->authorize(fn ($record) => auth()->user()->can('reject-requirement', $record)),

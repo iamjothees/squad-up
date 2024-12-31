@@ -14,6 +14,8 @@ class CreateRequirement extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         
+        $data['owner_id'] = auth()->id();
+        
         $data['referer_id'] = User::where('referal_partner_code', $data['referal_partner_code'])->first()?->id;
         unset($data['referal_partner_code']);
     

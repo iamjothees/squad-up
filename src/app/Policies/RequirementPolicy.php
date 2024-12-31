@@ -38,7 +38,7 @@ class RequirementPolicy
      */
     public function update(User $user, Requirement $requirement): bool
     {
-        return $requirement->status === RequirementStatus::PENDING || $user->id === $requirement->admin_id;
+        return $requirement->status === RequirementStatus::PENDING && $user->id === $requirement->admin_id || $user->id === $requirement->owner_id;
     }
 
     /**

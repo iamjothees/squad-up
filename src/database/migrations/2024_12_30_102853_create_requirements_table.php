@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('requirements', function (Blueprint $table) {
             $table->id();
+            $table->string('referal_code')->unique();
             $table->string('title');
             $table->text('description')->nullable();
             $table->foreignId('service_id')->constrained('services');
-            $table->foreignId('owner_id')->nullable()->constrained('users');
+            $table->foreignId('owner_id')->constrained('users');
             $table->foreignId('referer_id')->nullable()->constrained('users');
             $table->foreignId('admin_id')->nullable()->constrained('users');
             $table->timestamp('required_at')->nullable();

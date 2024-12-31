@@ -7,8 +7,16 @@ use App\Service\RequirementService;
 
 class RequirementObserver
 {
-    public function created(Requirement $requirement): void{
-        app(RequirementService::class)->createPoints(requirement: $requirement);
+    public function creating(Requirement $requirement): void
+    {
+        $requirement->referal_code = str()->uuid();
+    }
+
+    public function created(Requirement $requirement): void
+    {
+        $requirement->referal_code = app(RequirementService::class)->generateReferalCode(requirement: $requirement);
+        $requirement->saveQuietly();
+        if ( $requirement->referer_id ) app(RequirementService::class)->createPoints(requirement: $requirement);
     }
  
     public function updated(Requirement $requirement): void
