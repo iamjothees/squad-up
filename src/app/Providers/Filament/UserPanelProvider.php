@@ -25,9 +25,12 @@ class UserPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+        $panel = match (config('app.env')) {
+            'local' => $panel->path('console'),
+            default => $panel->domain('console.localhost'),
+        };
         return $panel
             ->id('user')
-            ->domain('console.localhost')
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -56,7 +59,7 @@ class UserPanelProvider extends PanelProvider
             ])
             ->plugin(new LocalLogins())
             ->font('Roboto Mono')
-            ->defaultThemeMode(ThemeMode::Dark)
+            ->darkMode(true, true)
             ->colors([
                 'primary' => '#006600',
             ])
