@@ -20,7 +20,7 @@ class RequirementService
     }
 
     public function generateReferalCode(Requirement $requirement): string{
-        return "REQ-{$requirement->id}-" . str(str()->uuid())->take(4);
+        return "REQ-".str($requirement->id)->padLeft(4, '0')."-" . str(str()->uuid())->take(4)->upper();
     }
 
     public function accept(Requirement $requirement): Requirement{
