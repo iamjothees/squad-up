@@ -77,3 +77,6 @@ _____ upgrade of the lead
 
 # Phase II
 ## Gamification ( Leaderboard )
+
+### Requirements
+ - Prefered Team member ( based on service )

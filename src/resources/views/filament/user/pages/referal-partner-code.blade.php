@@ -1,6 +1,4 @@
-@assets()
-    @vite(['resources/js/app.js', 'resources/css/app.css'])
-@endassets
+@assets() @vite(['resources/js/app.js']) @endassets
 <x-filament-panels::page>
     <div 
         x-on:click="$clipboard('hello world')"

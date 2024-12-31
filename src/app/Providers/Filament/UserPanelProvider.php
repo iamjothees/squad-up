@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\User\Pages\Auth\Register;
+use App\Filament\User;
 use BetterFuturesStudio\FilamentLocalLogins\LocalLogins;
 use Filament\Enums\ThemeMode;
 use Filament\Http\Middleware\Authenticate;
@@ -39,7 +40,7 @@ class UserPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/User/Resources'), for: 'App\\Filament\\User\\Resources')
             ->discoverPages(in: app_path('Filament/User/Pages'), for: 'App\\Filament\\User\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                User\Pages\Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/User/Widgets'), for: 'App\\Filament\\User\\Widgets')
             ->widgets([])
@@ -64,6 +65,7 @@ class UserPanelProvider extends PanelProvider
                 'primary' => '#006600',
             ])
             ->topNavigation()
-            ->databaseTransactions();
+            ->databaseTransactions()
+            ->viteTheme('resources/css/filament/user/theme.css');
     }
 }
