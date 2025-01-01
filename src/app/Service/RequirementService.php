@@ -90,7 +90,7 @@ class RequirementService
         return [
             Forms\Components\Select::make('owner_id')
                 ->label('Owner')
-                ->relationship('owner', 'name', fn (Builder $query) => $query->onlyUsers())
+                ->relationship('owner', 'name')
                 ->required()
                 ->preload(config('app.env') === 'local')
                 ->searchable()
