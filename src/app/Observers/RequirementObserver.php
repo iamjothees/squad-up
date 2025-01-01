@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Enum\RequirementStatus;
 use App\Models\Requirement;
 use App\Service\RequirementService;
 
@@ -14,17 +15,27 @@ class RequirementObserver
 
     public function created(Requirement $requirement): void
     {
+        // generating referal code
         $requirement->referal_code = app(RequirementService::class)->generateReferalCode(requirement: $requirement);
         $requirement->saveQuietly();
+
+        // crediting points
         if ( $requirement->referer_id ) app(RequirementService::class)->createPoints(requirement: $requirement);
     }
  
     public function updated(Requirement $requirement): void
     {
+        // updating points
         if ( $requirement->isDirty('referer_id') || $requirement->isDirty('expecting_budget') ){
             $requirement->referer_id
                 ? app(RequirementService::class)->updatePoints(requirement: $requirement)
                 : app(RequirementService::class)->destroyPoints(requirement: $requirement);
+        }
+
+        // updating status
+        if ( $requirement->isDirty('project_id') ){
+            $requirement->status = ($requirement->project_id) ? RequirementStatus::APPROVED : RequirementStatus::PENDING;
+            $requirement->saveQuietly();
         }
     }
  

@@ -20,6 +20,8 @@ class PointService
             'participation_level' => $participationLevel,
             'calc_config' => app(GeneralSettings::class)->points_config
         ]);
+
+        // Notify referer, owner
     }
 
     public function updatePoints(Requirement $requirement, int $participationLevel = 1): void{
@@ -30,6 +32,7 @@ class PointService
                 'participation_level' => $participationLevel
             ]);
 
+            // Notify referer
             return;
         }
 
@@ -38,6 +41,8 @@ class PointService
 
     public function destroyPoints(Requirement $requirement): void{
         $requirement->point?->delete();
+
+        // Notify referer
     }
 
     
@@ -46,6 +51,8 @@ class PointService
         $requirement->point()->update([
             'points' => $this->generatePoints($requirement->project->committed_budget, pointsConfig: $requirement->point->calc_config)
         ]);
+
+        // Notify referer
     }
 
 

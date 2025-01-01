@@ -63,4 +63,9 @@ class RequirementResource extends Resource
             'edit' => Pages\EditRequirement::route('/{record}/edit'),
         ];
     }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return RequirementService::getEloquentQuery( query: parent::getEloquentQuery() );
+    }
 }

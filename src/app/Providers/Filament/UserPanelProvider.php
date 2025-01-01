@@ -4,13 +4,14 @@ namespace App\Providers\Filament;
 
 use App\Filament\User\Pages\Auth\Register;
 use App\Filament\User;
+use App\Filament\User\Pages\Auth\Login;
 use BetterFuturesStudio\FilamentLocalLogins\LocalLogins;
-use Filament\Enums\ThemeMode;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages;
+use Filament\Pages\Auth\EditProfile;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -32,11 +33,9 @@ class UserPanelProvider extends PanelProvider
         };
         return $panel
             ->id('user')
-            ->colors([
-                'primary' => Color::Amber,
-            ])
-            ->login()
+            ->login(Login::class)
             ->registration(Register::class)
+            ->profile(EditProfile::class)
             ->discoverResources(in: app_path('Filament/User/Resources'), for: 'App\\Filament\\User\\Resources')
             ->discoverPages(in: app_path('Filament/User/Pages'), for: 'App\\Filament\\User\\Pages')
             ->pages([
@@ -58,7 +57,7 @@ class UserPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ->plugin(new LocalLogins())
+            // ->plugin(new LocalLogins())
             ->font('Roboto Mono')
             ->darkMode(true, true)
             ->colors([

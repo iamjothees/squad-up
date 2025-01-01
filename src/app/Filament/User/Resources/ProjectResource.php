@@ -28,20 +28,22 @@ class ProjectResource extends Resource
                 Tables\Columns\TextColumn::make('title')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('service.name')
-                    ->numeric()
-                    ->sortable(),
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('admin.name')
-                    ->numeric()
-                    ->sortable(),
+                    ->description(fn ($record) => $record->admin->phone)
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('started_at')
                     ->dateTime('d-m-Y h:i A')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('expected_completed_at')
                     ->dateTime('d-m-Y h:i A')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('completed_at')
                     ->dateTime('d-m-Y h:i A')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('delivered_at')
                     ->dateTime('d-m-Y h:i A')
                     ->visible(fn (?Project $record): bool => $record?->delivered_at !== null)

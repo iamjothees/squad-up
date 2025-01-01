@@ -24,6 +24,8 @@ class Register extends BaseRegister
 
     protected function getPhoneFormComponent(){
         return PhoneInput::make('phone')
-            ->defaultCountry('IN');
+            ->label("Phone number")
+            ->defaultCountry('IN')
+            ->unique('users', 'phone');
     }
 }

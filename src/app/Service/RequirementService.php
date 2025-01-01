@@ -8,7 +8,7 @@ use App\Models\Requirement;
 use Filament\Forms;
 use Filament\Resources\Components\Tab;
 use Filament\Tables;
-use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Number;
 use Illuminate\Validation\Rule;
 
@@ -45,11 +45,15 @@ class RequirementService
             'service_id' => $requirement->service_id,
             'admin_id' => $requirement->admin_id,
             'committed_budget' => $requirement->expecting_budget,
-        ]);        
+        ]);
         $requirement->project_id = $project->id;
+        $requirement->status = RequirementStatus::APPROVED;
         $requirement->save();
 
-        // credit points
+        // crediting points through observer
+
+        // Notify owner
+        
 
         return $project;
     }
@@ -68,6 +72,18 @@ class RequirementService
 
     public function creditPoints( Requirement $requirement ){
         app(PointService::class)->creditPoints(requirement: $requirement);
+    }
+
+    public static function getEloquentQuery(Builder $query): Builder{
+        return $query
+            ->whereNot('status', RequirementStatus::APPROVED)
+            ->when(
+                auth()->user()->hasRole('admin'),
+                fn (Builder $query) => $query->where(
+                    fn ($q) => $q->where('admin_id', auth()->id())->orWhereNull('admin_id')
+                ),
+                fn (Builder $query) => $query->where('owner_id', auth()->id())
+            );
     }
 
     public static function getFormSchema(): array{
@@ -161,9 +177,10 @@ class RequirementService
 
     public static function getTabs(): array{
         return [
-            'yet_to_confirm' => Tab::make()
+            'queued_for_confirmation' => Tab::make()
+                ->label('Queued for Confirmation')
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('status', RequirementStatus::PENDING)),
-            'in_progress' => Tab::make()
+            'active' => Tab::make()
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('status', RequirementStatus::IN_PROGRESS)),
             'rejected' => Tab::make()
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('status', RequirementStatus::REJECTED)),

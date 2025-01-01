@@ -37,7 +37,6 @@ class ReferalPartnerShareInfoCard extends Component implements HasInfolists, Has
                 SimpleAlert::make('disclaimer')
                     ->warning()
                     ->icon('icon-confette')
-                    ->title('let\'s make it happen!')
                     ->description('Your shares will be credited as soon as the project gets the green light.🚀'),
                 Section::make('Referal Partner\'s Shares Info')
                     ->schema([
