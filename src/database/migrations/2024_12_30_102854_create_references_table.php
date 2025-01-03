@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('redeems', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('owner_id')->constrained('users');
-            $table->unsignedInteger('points');
-            $table->timestamps();
-            $table->softDeletes();
+        Schema::table('references', function (Blueprint $table) {
+            $table->morphs('referenceable');
+            $table->foreignId('referer_id')->nullable()->constrained('users');
+            $table->unsignedTinyInteger('participation_level')->default(1);
+            $table->json('calc_config');
         });
     }
 
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('redeems');
+        Schema::dropIfExists('references');
     }
 };

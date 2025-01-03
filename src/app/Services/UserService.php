@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Service;
+namespace App\Services;
 
-use App\Enum\RequirementStatus;
+use App\Enums\RequirementStatus;
 use App\Models\User;
 
 class UserService

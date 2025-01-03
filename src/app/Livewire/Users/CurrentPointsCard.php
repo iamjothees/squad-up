@@ -3,7 +3,7 @@
 namespace App\Livewire\Users;
 
 use App\Models\User;
-use App\Service\UserService;
+use App\Services\UserService;
 use Livewire\Component;
 
 class CurrentPointsCard extends Component

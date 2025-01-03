@@ -2,11 +2,11 @@
 
 namespace App\Filament\Resources\RequirementResource\Pages;
 
-use App\Enum\RequirementStatus;
+use App\Enums\RequirementStatus;
 use App\Filament\Resources\ProjectResource;
 use App\Filament\Resources\RequirementResource;
 use App\Models\Requirement;
-use App\Service\RequirementService;
+use App\Services\RequirementService;
 use Closure;
 use Filament\Actions;
 use Filament\Notifications\Notification;

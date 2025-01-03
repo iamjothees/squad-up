@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\RequirementResource\Pages;
 
 use App\Filament\Resources\RequirementResource;
-use App\Service\RequirementService;
+use App\Services\RequirementService;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 

@@ -5,7 +5,7 @@ namespace App\Filament\User\Resources;
 use App\Filament\User\Resources\RequirementResource\Pages;
 use App\Filament\User\Resources\RequirementResource\RelationManagers;
 use App\Models\Requirement;
-use App\Service\RequirementService;
+use App\Services\RequirementService;
 use Filament\Forms\Form;
 use Filament\Navigation\NavigationItem;
 use Filament\Resources\Resource;

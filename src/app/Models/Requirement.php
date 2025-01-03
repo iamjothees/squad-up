@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Casts\MoneyCast;
-use App\Enum\RequirementStatus;
+use App\Enums\RequirementStatus;
 use App\Observers\RequirementObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

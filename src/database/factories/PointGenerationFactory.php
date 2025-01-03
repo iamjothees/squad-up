@@ -5,9 +5,9 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Redeem>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\PointGeneration>
  */
-class RedeemFactory extends Factory
+class PointGenerationFactory extends Factory
 {
     /**
      * Define the model's default state.

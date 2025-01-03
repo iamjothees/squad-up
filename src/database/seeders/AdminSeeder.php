@@ -6,18 +6,17 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
-class AdminSeeder extends Seeder
+class TeamMemberSeeder extends Seeder
 {
     public function run(): void
     {
-        
         User::create([
             'name' => 'Jotheeswaran S',
             'email' => 'iamjothees@gmail.com',
             'phone' => '+919442608662',
             'password' => Hash::make('admin@123'),
             'referal_partner_code' => 'RPC-JOE-8662',
-        ])->assignRole('admin');
+        ])->assignRole('admin')->assignRole('team-member');
 
 
         User::create([
@@ -26,7 +25,7 @@ class AdminSeeder extends Seeder
             'phone' => '+919361291477',
             'password' => Hash::make('admin@123'),
             'referal_partner_code' => 'RPC-GOW-1477',
-        ])->assignRole('admin');
+        ])->assignRole('team-member');
 
         User::create([
             'name' => 'Tamilvanan',
@@ -34,7 +33,7 @@ class AdminSeeder extends Seeder
             'phone' => '+917339488948',
             'password' => Hash::make('admin@123'),
             'referal_partner_code' => 'RPC-TAM-2610',
-        ])->assignRole('admin');
+        ])->assignRole('team-member');
 
         User::create([
             'name' => 'Sasikumar M',
@@ -42,6 +41,6 @@ class AdminSeeder extends Seeder
             'email' => '+919025382009',
             'password' => Hash::make('admin@123'),
             'referal_partner_code' => 'RPC-SAS-2009',
-        ])->assignRole('admin');
+        ])->assignRole('team-member');
     }
 }

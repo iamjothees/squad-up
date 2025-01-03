@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use App\Service\UserService;
+use App\Services\UserService;
 
 uses(Tests\TestCase::class);
 

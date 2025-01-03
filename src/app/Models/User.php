@@ -4,7 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-use App\Enum\Point\GeneratedArea;
+use App\Enums\Point\GeneratedArea;
 use App\Observers\UserObserver;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -48,10 +48,10 @@ class User extends Authenticatable implements FilamentUser
         ];
     }
 
-    public function scopeOnlyAdmins($query){
+    public function scopeOnlyTeamMembers($query){
         return $query
             ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
-            ->where('model_has_roles.role_id', config('auth.roles.admin'));
+            ->where('model_has_roles.role_id', config('auth.roles.team_member'));
     }
 
     public function scopeOnlyUsers($query){

@@ -11,16 +11,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('points', function (Blueprint $table) {
+        Schema::table('users', function (Blueprint $table) {
+            $table->unsignedInteger('points')->default(0);
+        });
+
+        Schema::table('point_generations', function (Blueprint $table) {
             $table->id();
-            $table->string('status')->default('pending');
-            $table->string('generated_area');
-            $table->foreignId('requirement_id')->nullable()->constrained('requirements');
-            $table->foreignId('owner_id')->constrained('users');
             $table->unsignedInteger('points');
-            $table->unsignedTinyInteger('participation_level')->default(1);
-            $table->json('calc_config');
+            $table->string('generated_for'); // 'signup' | 'reference'
+            $table->nullableMorphs('generator');
+            $table->timestamp('credited_at')->nullable();
+            $table->softDeletes();
+        });
+
+        Schema::create('point_redeems', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('owner_id')->constrained('users')->unique();
+            $table->unsignedInteger('points');
+            $table->timestamp('redeemed_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -29,6 +39,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('points');
+        Schema::dropIfExists('point_redeems');
+        Schema::dropIfExists('point_generations');
+
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('points');
+        });
+        
     }
 };

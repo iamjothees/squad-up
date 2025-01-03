@@ -2,9 +2,9 @@
 
 namespace App\Observers;
 
-use App\Enum\RequirementStatus;
+use App\Enums\RequirementStatus;
 use App\Models\Requirement;
-use App\Service\RequirementService;
+use App\Services\RequirementService;
 
 class RequirementObserver
 {

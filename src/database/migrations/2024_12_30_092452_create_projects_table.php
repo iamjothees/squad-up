@@ -17,13 +17,12 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->foreignId('service_id')->constrained('services');
             $table->foreignId('admin_id')->constrained('users');
-            $table->timestamp('started_at')->nullable();
-            $table->timestamp('expected_completed_at')->nullable();
-            $table->timestamp('completed_at')->nullable();
-            $table->timestamp('delivered_at')->nullable();
+            $table->timestamp('start_at')->nullable();
+            $table->timestamp('completion_at')->nullable();
+            $table->timestamp('deliver_at')->nullable();
             $table->unsignedInteger('committed_budget'); // in INR (paise)
             $table->unsignedInteger('initial_payment'); // in INR (paise)
-            $table->unsignedTinyInteger('priority_range')->default(1); // 1 - 10
+            $table->unsignedTinyInteger('priority_level')->default(1); // 1 - 10
             $table->timestamps();
             $table->softDeletes();
         });

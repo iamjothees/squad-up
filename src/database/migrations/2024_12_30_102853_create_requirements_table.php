@@ -18,10 +18,9 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->foreignId('service_id')->constrained('services');
             $table->foreignId('owner_id')->constrained('users');
-            $table->foreignId('referer_id')->nullable()->constrained('users');
             $table->foreignId('admin_id')->nullable()->constrained('users');
-            $table->timestamp('required_at')->nullable();
-            $table->unsignedInteger('expecting_budget'); // in INR (paise)
+            $table->timestamp('completion_at')->nullable();
+            $table->unsignedInteger('budget'); // in INR (paise)
             $table->string('status')->default('pending');
             $table->foreignId('project_id')->nullable()->constrained('projects');
             $table->timestamps();

@@ -2,9 +2,9 @@
 
 namespace App\Filament\User\Resources\RequirementResource\Pages;
 
-use App\Enum\RequirementStatus;
+use App\Enums\RequirementStatus;
 use App\Filament\User\Resources\RequirementResource;
-use App\Service\RequirementService;
+use App\Services\RequirementService;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Contracts\Support\Htmlable;

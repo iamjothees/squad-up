@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\Requirement;
-use App\Service\RequirementService;
+use App\Services\RequirementService;
 
 uses(Tests\TestCase::class);
 test('it_tests_generate_requirement_referal_code', function () {

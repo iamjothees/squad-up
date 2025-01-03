@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Enum\RequirementStatus;
+use App\Enums\RequirementStatus;
 use App\Models\Requirement;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;

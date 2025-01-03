@@ -114,5 +114,6 @@ return [
 
     'roles' => [
         'admin' => env('ADMIN_ROLE_ID', 1),
+        'team_member' => env('TEAM_MEMBER_ROLE_ID', 2),
     ],
 ];

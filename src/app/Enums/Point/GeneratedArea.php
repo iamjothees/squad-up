@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Enum\Point;
+namespace App\Enums\Point;
 
 enum GeneratedArea: string
 {

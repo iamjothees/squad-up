@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Enum\Point\GeneratedArea;
-use App\Enum\Point\Status;
+use App\Enums\Point\GeneratedArea;
+use App\Enums\Point\Status;
 use App\Observers\PointObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Service;
+namespace App\Services;
 
-use App\Enum\RequirementStatus;
+use App\Enums\RequirementStatus;
 use App\Models\Project;
 use App\Models\Requirement;
+use App\Models\User;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Resources\Components\Tab;
@@ -31,7 +32,7 @@ class RequirementService
         $requirement->admin_id = auth()->id();
         $requirement->save();
 
-        app(PointService::class)->updateOrCreatePoints(requirement: $requirement);
+        // app(PointService::class)->updateOrCreatePoints(requirement: $requirement);
 
         return $requirement;    
     }
@@ -42,7 +43,7 @@ class RequirementService
         $requirement->status = RequirementStatus::REJECTED;
         $requirement->save();
 
-        app(PointService::class)->destroyPoints(requirement: $requirement);
+        // app(PointService::class)->destroyPoints(requirement: $requirement);
 
         return $requirement;    
     }
@@ -67,19 +68,19 @@ class RequirementService
     }
 
     public function createPoints( Requirement $requirement ){
-        app(PointService::class)->createPoints(requirement: $requirement);
+        // app(PointService::class)->createPoints(requirement: $requirement);
     }
 
     public function updateOrCreatePoints( Requirement $requirement ){
-        app(PointService::class)->updateOrCreatePoints(requirement: $requirement);
+        // app(PointService::class)->updateOrCreatePoints(requirement: $requirement);
     }
 
     public function destroyPoints( Requirement $requirement ){
-        app(PointService::class)->destroyPoints(requirement: $requirement);
+        // app(PointService::class)->destroyPoints(requirement: $requirement);
     }
 
     public function creditPoints( Requirement $requirement ){
-        app(PointService::class)->creditPoints(requirement: $requirement);
+        // app(PointService::class)->creditPoints(requirement: $requirement);
     }
 
     public static function getEloquentQuery(Builder $query): Builder{
@@ -88,10 +89,13 @@ class RequirementService
             ->when(
                 Filament::getCurrentPanel()->getId() === 'admin',
                 fn (Builder $query) => $query->where(
-                    fn ($q) => $q->where('admin_id', auth()->id())->orWhereNull('admin_id')
+                    fn ($q) =>  !auth()->user()->hasRole('admin') 
+                                    ? $q->where('admin_id', auth()->id())->orWhereNull('admin_id')
+                                    : $q
                 ),
                 fn (Builder $query) => $query->where(
-                    fn ($q) => $q->where('owner_id', auth()->id())->orWhere('referer_id', auth()->id())
+                    fn ($q) => $q->where('owner_id', auth()->id())
+                                ->orWhereHas(  'refererence', fn ($q) => $q->where('referer_id', auth()->id()) )
                 )
             );
     }
@@ -134,9 +138,9 @@ class RequirementService
                             ->where( fn ($q) => $q->whereNot('id', auth()->id()) )
                 ])
                 ->visible(!auth()->user()->hasRole('admin')),
-            Forms\Components\Select::make('referer_id')
+            Forms\Components\Select::make('referer_id') // TODO: handle reference creation
                 ->label("Referer")
-                ->relationship('referer', 'name' )
+                ->options(User::pluck('name', 'id'))
                 ->rules([
                     'not_in:'.auth()->id()
                 ])
@@ -147,10 +151,12 @@ class RequirementService
                 ->visible(auth()->user()->hasRole('admin')),
             Forms\Components\Select::make('admin_id')
                 ->label("Known Team member")
-                ->relationship('admin', 'name', fn (Builder $query) => $query->onlyAdmins() )
+                ->relationship('admin', 'name', fn (Builder $query) => $query->onlyTeamMembers() )
                 ->preload()
                 ->searchable(),
-            Forms\Components\DateTimePicker::make('required_at')->seconds(false),
+            Forms\Components\DateTimePicker::make('expecting_delivery_at')
+                ->seconds(false)
+                ->label('Expected Delivery Date Time'),
         ];
     }
 
@@ -165,9 +171,10 @@ class RequirementService
                 ->visible(auth()->user()->hasRole('admin')),
             Tables\Columns\TextColumn::make('admin.name')
                 ->label("Known Team member"),
-            Tables\Columns\TextColumn::make('referer.name')
-                ->description(fn ($record) => auth()->user()->hasRole('admin') ? ($record->referer?->phone ?? $record->referer?->email) : ''),
-            Tables\Columns\TextColumn::make('required_at')
+            // Tables\Columns\TextColumn::make('referer.name') // TODO references
+            //     ->description(fn ($record) => auth()->user()->hasRole('admin') ? ($record->referer?->phone ?? $record->referer?->email) : ''),
+            Tables\Columns\TextColumn::make('expecting_delivery_at')
+                ->label('Expected Delivery Date Time')
                 ->dateTime('d-m-Y h:i A'),
             Tables\Columns\TextColumn::make('expecting_budget')
                 ->money('INR')

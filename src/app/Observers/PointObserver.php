@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Enum\Point\GeneratedArea;
+use App\Enums\Point\GeneratedArea;
 use App\Models\Point;
 
 class PointObserver

@@ -3,7 +3,7 @@
 namespace App\Observers;
 
 use App\Models\User;
-use App\Service\UserService;
+use App\Services\UserService;
 use Illuminate\Support\Facades\Context;
 
 class UserObserver
@@ -15,15 +15,13 @@ class UserObserver
 
     public function creating(User $user): void
     {
-        Context::add('referal_partner_code_available', (bool) $user->referal_partner_code);
+        Context::add('referal_partner_code_provided', (bool) $user->referal_partner_code);
         $user->referal_partner_code = $user->referal_partner_code ?: str()->uuid();
     }
 
     public function created(User $user): void
     {
-        if (Context::get('referal_partner_code_available')) return;
-        $user->referal_partner_code = $this->userService->generateReferalPartnerCode(user: $user);
-        $user->saveQuietly();
+        $this->handleReferalPartnerCode($user);
     }
 
     /**
@@ -56,5 +54,12 @@ class UserObserver
     public function forceDeleted(User $user): void
     {
         //
+    }
+
+
+    private function handleReferalPartnerCode(User $user): void{
+        if (Context::get('referal_partner_code_provided')) return;
+        $user->referal_partner_code = $this->userService->generateReferalPartnerCode(user: $user);
+        $user->saveQuietly();
     }
 }
