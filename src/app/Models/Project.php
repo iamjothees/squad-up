@@ -17,6 +17,7 @@ class Project extends Model
         'completed_at' => 'datetime',
         'delivered_at' => 'datetime',
         'committed_budget' => MoneyCast::class,
+        'initial_payment' => MoneyCast::class,
     ];
 
     public function service(){

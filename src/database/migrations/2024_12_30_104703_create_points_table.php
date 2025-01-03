@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('points', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('requirement_id')->constrained('requirements');
+            $table->string('status')->default('pending');
+            $table->string('generated_area');
+            $table->foreignId('requirement_id')->nullable()->constrained('requirements');
             $table->foreignId('owner_id')->constrained('users');
             $table->unsignedInteger('points');
             $table->unsignedTinyInteger('participation_level')->default(1);

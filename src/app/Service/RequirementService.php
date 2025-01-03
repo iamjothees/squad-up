@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Enum\RequirementStatus;
 use App\Models\Project;
 use App\Models\Requirement;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Resources\Components\Tab;
 use Filament\Tables;
@@ -24,16 +25,24 @@ class RequirementService
     }
 
     public function accept(Requirement $requirement): Requirement{
+        if ($requirement->status !== RequirementStatus::PENDING) throw new \Exception("Can't accept processed Requirement");
+
         $requirement->status = RequirementStatus::IN_PROGRESS;
         $requirement->admin_id = auth()->id();
         $requirement->save();
+
+        app(PointService::class)->updateOrCreatePoints(requirement: $requirement);
 
         return $requirement;    
     }
 
     public function reject(Requirement $requirement): Requirement{
+        if ($requirement->status !== RequirementStatus::PENDING) throw new \Exception("Can't reject processed Requirement");
+
         $requirement->status = RequirementStatus::REJECTED;
         $requirement->save();
+
+        app(PointService::class)->destroyPoints(requirement: $requirement);
 
         return $requirement;    
     }
@@ -53,7 +62,6 @@ class RequirementService
         // crediting points through observer
 
         // Notify owner
-        
 
         return $project;
     }
@@ -62,8 +70,8 @@ class RequirementService
         app(PointService::class)->createPoints(requirement: $requirement);
     }
 
-    public function updatePoints( Requirement $requirement ){
-        app(PointService::class)->updatePoints(requirement: $requirement);
+    public function updateOrCreatePoints( Requirement $requirement ){
+        app(PointService::class)->updateOrCreatePoints(requirement: $requirement);
     }
 
     public function destroyPoints( Requirement $requirement ){
@@ -78,11 +86,13 @@ class RequirementService
         return $query
             ->whereNot('status', RequirementStatus::APPROVED)
             ->when(
-                auth()->user()->hasRole('admin'),
+                Filament::getCurrentPanel()->getId() === 'admin',
                 fn (Builder $query) => $query->where(
                     fn ($q) => $q->where('admin_id', auth()->id())->orWhereNull('admin_id')
                 ),
-                fn (Builder $query) => $query->where('owner_id', auth()->id())
+                fn (Builder $query) => $query->where(
+                    fn ($q) => $q->where('owner_id', auth()->id())->orWhere('referer_id', auth()->id())
+                )
             );
     }
 
@@ -126,9 +136,12 @@ class RequirementService
                 ->visible(!auth()->user()->hasRole('admin')),
             Forms\Components\Select::make('referer_id')
                 ->label("Referer")
-                ->relationship('referer', 'name', fn (Builder $query) => $query->whereNot('id', auth()->id()) )
+                ->relationship('referer', 'name' )
                 ->rules([
                     'not_in:'.auth()->id()
+                ])
+                ->validationMessages([
+                    'not_in' => 'You cannot refer yourself'
                 ])
                 ->searchable()
                 ->visible(auth()->user()->hasRole('admin')),

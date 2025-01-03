@@ -11,6 +11,7 @@ use Filament\Support\Enums\FontWeight;
 class ReferalPartnerCode extends Page
 {
     protected static ?string $navigationIcon = 'icon-qr-code';
+    protected static ?int $navigationSort = 2;
 
     protected static string $view = 'filament.user.pages.referal-partner-code';
 

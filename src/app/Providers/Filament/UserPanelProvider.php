@@ -5,11 +5,13 @@ namespace App\Providers\Filament;
 use App\Filament\User\Pages\Auth\Register;
 use App\Filament\User;
 use App\Filament\User\Pages\Auth\Login;
-use BetterFuturesStudio\FilamentLocalLogins\LocalLogins;
+use App\Filament\User\Resources\RequirementResource;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
+use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use Filament\Pages\Auth\EditProfile;
 use Filament\Panel;
@@ -64,6 +66,16 @@ class UserPanelProvider extends PanelProvider
                 'primary' => '#006600',
             ])
             ->topNavigation()
+            ->navigationItems([
+                NavigationItem::make('Refered Requirements')
+                    ->label('Refered')
+                    ->icon('icon-refered-requirements')
+                    ->url(fn () => RequirementResource::getUrl('refered'))
+                    ->isActiveWhen(fn () => request()->routeIs(RequirementResource::getRouteBaseName() . '.refered'))
+                    ->group('Requirements')
+                    ->sort(3),
+
+            ])
             ->databaseTransactions()
             ->viteTheme('resources/css/filament/user/theme.css');
     }

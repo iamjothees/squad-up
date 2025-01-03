@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Enum\Point\GeneratedArea;
 use App\Observers\UserObserver;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -57,5 +58,28 @@ class User extends Authenticatable implements FilamentUser
         return $query
             ->leftJoin('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
             ->whereNull('model_has_roles.role_id');
+    }
+
+    public function referedRequirements(){
+        return $this->hasMany(Requirement::class, 'referer_id');
+    }
+
+    public function requirements(){
+        return $this->hasMany(Requirement::class, 'owner_id');
+    }
+
+    public function projects(){
+        return $this->hasMany(Project::class, 'owner_id');
+    }
+
+    public function points(){
+        return $this->hasMany(Point::class, 'owner_id');
+    }
+
+    public function getCurrentPointsAttribute(){
+        return $this->points()
+            ->where(
+                fn ($q) => $q->where('generated_area', GeneratedArea::SIGNUP)->
+            )
     }
 }

@@ -13,7 +13,7 @@ class PointService
         //
     }
 
-    public function createPoints(Requirement $requirement, int $participationLevel = 1): void{
+    public function createPointsForRequirement( Requirement $requirement, int $participationLevel = 1 ): void{
         $requirement->point()->create([
             'owner_id' => $requirement->referer_id,
             'points' => $this->generatePoints(budget: $requirement->expecting_budget, participationLevel: $participationLevel),
@@ -24,7 +24,7 @@ class PointService
         // Notify referer, owner
     }
 
-    public function updatePoints(Requirement $requirement, int $participationLevel = 1): void{
+    public function updateOrCreatePointsForRequirement(Requirement $requirement, int $participationLevel = 1): void{
         if($requirement->point){
             $requirement->point->update([
                 'owner_id' => $requirement->referer_id,
@@ -36,7 +36,7 @@ class PointService
             return;
         }
 
-        $this->createPoints(requirement: $requirement);
+        $this->createPointsForRequirement(requirement: $requirement);
     }
 
     public function destroyPoints(Requirement $requirement): void{

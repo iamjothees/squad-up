@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Enum\RequirementStatus;
 use App\Models\User;
 
 class UserService
@@ -9,6 +10,14 @@ class UserService
     public function __construct()
     {
         //
+    }
+
+    public function getExpectingPoints(User $user): int{
+        return $user->points()->expecting()->sum('points');
+    }
+
+    public function getCurrentPoints(User $user): int{
+        return $user->currentPoints();
     }
 
     public function generateReferalPartnerCode(User $user){

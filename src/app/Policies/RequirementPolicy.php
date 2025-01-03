@@ -38,7 +38,7 @@ class RequirementPolicy
      */
     public function update(User $user, Requirement $requirement): bool
     {
-        return $requirement->status === RequirementStatus::PENDING && $user->id === $requirement->admin_id || $user->id === $requirement->owner_id;
+        return $requirement->status === RequirementStatus::PENDING && ($user->id === $requirement->admin_id || $user->id === $requirement->owner_id);
     }
 
     /**
@@ -67,7 +67,7 @@ class RequirementPolicy
 
     public function acceptRequirement(User $user, Requirement $requirement): bool
     {
-        return $requirement->status === RequirementStatus::PENDING;
+        return $requirement->status === RequirementStatus::PENDING && (!$requirement->admin_id || $user->id === $requirement->admin_id);
     }
 
     public function rejectRequirement(User $user, Requirement $requirement): bool

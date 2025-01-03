@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('redeems', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('owner_id')->constrained('users');
             $table->unsignedInteger('points');
             $table->timestamps();
             $table->softDeletes();
