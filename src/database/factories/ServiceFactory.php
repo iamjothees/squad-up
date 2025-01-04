@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\ServiceStatus;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,15 @@ class ServiceFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => fake()->word(),
+            'description' => fake()->boolean() ? null : fake()->text(100),
+            'status' => fake()->randomElement(ServiceStatus::cases()),
         ];
+    }
+
+    public function active(): self{
+        return $this->state(fn () => [
+                'status' => ServiceStatus::ACTIVE,
+            ]);
     }
 }

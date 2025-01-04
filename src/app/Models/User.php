@@ -76,10 +76,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Point::class, 'owner_id');
     }
 
-    public function getCurrentPointsAttribute(){
-        return $this->points()
-            ->where(
-                fn ($q) => $q->where('generated_area', GeneratedArea::SIGNUP)->
-            )
-    }
+    // public function getCurrentPointsAttribute(){
+    //     return $this
+    //     $this->points()
+    //         ->where(
+    //             fn ($q) => $q->where('generated_area', GeneratedArea::SIGNUP)->
+    //         )
+    // }
 }

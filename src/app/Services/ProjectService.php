@@ -12,7 +12,7 @@ class ProjectService
         //
     }
 
-    public function createProjects(ProjectDTO $projectDTO): ProjectDTO{
+    public function createProject(ProjectDTO $projectDTO): ProjectDTO{
         $project = Project::create($projectDTO->toCreateArray());
 
         // TODO: crediting points

@@ -4,13 +4,16 @@ namespace App\DTOs;
 
 use App\Models\Project;
 use App\Rules\Money;
-use Filament\Facades\Filament;
+use App\Rules\User\TeamMember;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
 
 class ProjectDTO extends ModelDTO
 {
+    use InteractsWithModelDTO;
+
     private Project $model;
+    private string $modelType = Project::class;
 
     public ?int $id;
     public string $title;
@@ -20,40 +23,22 @@ class ProjectDTO extends ModelDTO
     public ?string $start_at;
     public ?string $completion_at;
     public ?string $deliver_at;
-    public int $committed_budget;
-    public int $initial_payment;
-    public int $priority_level = 1;
+    public float $committed_budget;
+    public float $initial_payment;
+    public int $priority_level;
 
     public function __construct()
     {
         //
     }
 
-    public static function fromModel(Model $model): self{
-        //
-    }
-    public static function fromArray(array $data): self{
-        $dto = new self();
-        $dto->fill($data);
-        return $dto;
-    }
-
-    public function toArray(): array{
-        //
-    }
-    public function toCreateArray(): array{
-        //
-    }
-    public function toModel(): Model{
-        //
-    }
-
     protected function fill(array $data): void{
         $Validator = Validator::make($data, [
+            'id' => ['nullable', 'exists:projects,id'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'service_id' => ['required', 'exists:services,id'],
-            'admin_id' => ['required', 'exists:users,id'],
+            'admin_id' => ['required', new TeamMember],
             'start_at' => ['nullable', 'date'],
             'completion_at' => ['nullable', 'date'],
             'deliver_at' => ['nullable', 'date'],
@@ -68,16 +53,17 @@ class ProjectDTO extends ModelDTO
         }
         $data = $Validator->validated();
 
+        $this->id = $data['id'] ?? null;
         $this->title = $data['title'];
-        $this->description = $data['description'];
+        $this->description = $data['description'] ?? null;
         $this->service_id = $data['service_id'];
         $this->admin_id = $data['admin_id'];
-        $this->start_at = $data['start_at'];
-        $this->completion_at = $data['completion_at'];
-        $this->deliver_at = $data['deliver_at'];
+        $this->start_at = $data['start_at'] ?? null;
+        $this->completion_at = $data['completion_at'] ?? null;
+        $this->deliver_at = $data['deliver_at'] ?? null;
         $this->committed_budget = $data['committed_budget'];
         $this->initial_payment = $data['initial_payment'];
-        $this->priority_level = $data['priority_level'];
+        $this->priority_level = $data['priority_level'] ?? 1;
     }
 
 }

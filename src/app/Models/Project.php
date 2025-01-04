@@ -13,10 +13,9 @@ class Project extends Model
     use HasFactory, SoftDeletes;
 
     protected $casts = [
-        'started_at' => 'datetime',
-        'expected_completed_at' => 'datetime',
-        'completed_at' => 'datetime',
-        'delivered_at' => 'datetime',
+        'start_at' => 'datetime',
+        'completion_at' => 'datetime',
+        'deliver_at' => 'datetime',
         'committed_budget' => MoneyCast::class,
         'initial_payment' => MoneyCast::class,
     ];

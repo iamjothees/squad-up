@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 abstract class ModelDTO
 {
-    abstract public static function fromModel(Model $model): self;
     abstract public static function fromArray(array $data): self;
+    abstract public static function fromModel(Model $model): self;
 
     abstract public function toArray(): array;
     abstract public function toCreateArray(): array;

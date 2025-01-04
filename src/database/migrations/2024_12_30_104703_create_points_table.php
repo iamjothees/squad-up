@@ -15,7 +15,7 @@ return new class extends Migration
             $table->unsignedInteger('points')->default(0);
         });
 
-        Schema::table('point_generations', function (Blueprint $table) {
+        Schema::create('point_generations', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('points');
             $table->string('generated_for'); // 'signup' | 'reference'
