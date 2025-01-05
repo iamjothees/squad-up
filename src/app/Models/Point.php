@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Enums\Point\GeneratedArea;
+use App\Enums\Point\GenerationArea;
 use App\Enums\Point\Status;
 use App\Observers\PointObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -16,7 +16,7 @@ class Point extends Model
 
     protected $casts = [
         'status' => Status::class,
-        'generated_area' => GeneratedArea::class,
+        'generation_area' => GenerationArea::class,
         'calc_config' => 'array',
     ];
 
@@ -26,8 +26,8 @@ class Point extends Model
         return $query->where('status', Status::EXPECTING);
     }
 
-    public function scopeGeneratedFromRequirement($query){
-        return $query->where('generated_area', GeneratedArea::class);
+    public function scopeGenerationFromRequirement($query){
+        return $query->where('generation_area', GenerationArea::class);
     }
 
     public function owner(){

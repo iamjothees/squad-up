@@ -4,7 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-use App\Enums\Point\GeneratedArea;
+use App\Enums\Point\GenerationArea;
 use App\Observers\UserObserver;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -80,7 +80,7 @@ class User extends Authenticatable implements FilamentUser
     //     return $this
     //     $this->points()
     //         ->where(
-    //             fn ($q) => $q->where('generated_area', GeneratedArea::SIGNUP)->
+    //             fn ($q) => $q->where('generated_area', GenerationArea::SIGNUP)->
     //         )
     // }
 }

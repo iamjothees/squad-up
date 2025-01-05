@@ -4,7 +4,7 @@ namespace App\Enums\Point;
 
 use App\Models\Requirement;
 
-enum GeneratedArea: string
+enum GenerationArea: string
 {
     case REQUIREMENT = 'requirement';
     case SIGNUP = 'signup';
@@ -13,6 +13,12 @@ enum GeneratedArea: string
         return match($this){
             self::REQUIREMENT => Requirement::class,
             default => null,
+        };
+    }
+
+    public function getPointsInINR(): float{
+        return match($this){
+            default => 0
         };
     }
 }

@@ -6,7 +6,7 @@ use App\DTOs\ProjectDTO;
 use App\DTOs\ReferenceDTO;
 use App\DTOs\RequirementDTO;
 use App\DTOs\UserDTO;
-use App\Enums\Point\GeneratedArea;
+use App\Enums\Point\GenerationArea;
 use App\Enums\RequirementStatus;
 use App\Enums\ServiceStatus;
 use App\Models\PointGeneration;
@@ -88,7 +88,7 @@ dataset(
             PointGenerationDTO::class,
             fn () => [
                 'points' => 100 * 100,
-                'generated_area' => GeneratedArea::REQUIREMENT,
+                'generation_area' => GenerationArea::REQUIREMENT,
                 'generator_type' => Requirement::class,
                 'generator_id' => Requirement::factory()->create()->id,
             ]
