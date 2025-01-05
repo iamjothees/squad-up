@@ -6,6 +6,7 @@ use App\Enums\RequirementStatus;
 use App\Models\Requirement;
 use App\Rules\User\TeamMember;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -23,7 +24,7 @@ class RequirementDTO extends FilamentResourceDTO
     public int $service_id;
     public int $owner_id;
     public ?int $admin_id;
-    public ?string $completion_at;
+    public ?Carbon $completion_at;
     public float $budget;
     public RequirementStatus $status;
     public ?int $project_id;
@@ -65,7 +66,7 @@ class RequirementDTO extends FilamentResourceDTO
         $this->service_id = $data['service_id'];
         $this->owner_id = $data['owner_id'];
         $this->admin_id = $data['admin_id'] ?? null;
-        $this->completion_at = $data['completion_at'] ?? null;
+        $this->completion_at = Carbon::make($data['completion_at'] ?? null);
         $this->budget = $data['budget'];
         $this->status = $data['status'];
         $this->project_id = $data['project_id'] ?? null;

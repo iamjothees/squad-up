@@ -1,11 +1,18 @@
 <?php
 
+use App\DTOs\PointGenerationDTO;
+use App\DTOs\PointRedeemDTO;
 use App\DTOs\ProjectDTO;
 use App\DTOs\ReferenceDTO;
 use App\DTOs\RequirementDTO;
+use App\DTOs\UserDTO;
+use App\Enums\Point\GeneratedArea;
 use App\Enums\RequirementStatus;
 use App\Enums\ServiceStatus;
+use App\Models\PointGeneration;
+use App\Models\PointRedeem;
 use App\Models\Project;
+use App\Models\Reference;
 use App\Models\Requirement;
 use App\Models\Service;
 use App\Models\User;
@@ -22,6 +29,7 @@ dataset(
                 'service_id' => Service::factory()->create(['status' => ServiceStatus::ACTIVE])->id,
                 'admin_id' => User::factory()->teamMember()->create()->id,
                 'start_at' => now()->addDays(3),
+                'completion_at' => now()->addDays(5),
                 'committed_budget' => 24999.99,
                 'initial_payment' => 12000.00,
                 'priority_level' => 1
@@ -59,6 +67,39 @@ dataset(
                 'participation_level' => 1,
                 'calc_config' => (new GeneralSettings())->points_config,
             ]
+        ],
+        [
+            UserDTO::class,
+            fn () => [
+                'name' => 'Test User',
+                'email' => 'unique-test-user@test.dev',
+                'password' => 'password',
+            ]
+        ],
+        [
+            UserDTO::class,
+            fn () => [
+                'name' => 'Test User',
+                'phone' => '9123456789',
+                'password' => 'password',
+            ]
+        ],
+        [
+            PointGenerationDTO::class,
+            fn () => [
+                'points' => 100 * 100,
+                'generated_area' => GeneratedArea::REQUIREMENT,
+                'generator_type' => Requirement::class,
+                'generator_id' => Requirement::factory()->create()->id,
+            ]
+        ],
+        [
+            PointRedeemDTO::class,
+            fn () => [
+                'owner_id' => User::factory()->create()->id,
+                'points' => 100 * 100,
+                'redeemed_at' => now()->subDays(3),
+            ]
         ]
     ]
 );
@@ -75,6 +116,22 @@ dataset(
             RequirementDTO::class, 
             fn () => Requirement::factory()->create(),
         ],
+        [
+            ReferenceDTO::class,
+            fn () => Reference::factory()->create(),
+        ],
+        [
+            UserDTO::class,
+            fn () => User::factory()->create(),
+        ],
+        [
+            PointGenerationDTO::class,
+            fn () => PointGeneration::factory()->create(),
+        ],
+        [
+            PointRedeemDTO::class,
+            fn () => PointRedeem::factory()->create(),
+        ]
     ]
 );
 
@@ -91,5 +148,10 @@ dataset(
             fn () => Requirement::factory()->create(),
             Requirement::class,
         ],
+        [
+            UserDTO::class,
+            fn () => User::factory()->create(),
+            User::class,
+        ]
     ]
 );

@@ -2,22 +2,19 @@
 
 namespace Database\Factories;
 
+use App\Enums\Point\GeneratedArea;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\PointGeneration>
- */
 class PointGenerationFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            //
+            'points' => fake()->numberBetween(50, 2500) * 100,
+            'generated_area' => fake()->randomElement(GeneratedArea::cases()),
+            'generator_type' => fn (array $attributes) => $attributes['generated_area']->generatorKey(),
+            'generator_id' => fn (array $attributes) => $attributes['generator_type'] ? $attributes['generator_type']::factory()->create()->id : null,
+            'credited_at' => fake()->dateTimeBetween('-1 year', 'now'),
         ];
     }
 }

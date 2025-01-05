@@ -3,6 +3,7 @@
 namespace App\DTOs;
 
 use App\Models\Reference;
+use App\Rules\MorphId;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -29,14 +30,7 @@ class ReferenceDTO extends ModelDTO
         $validator =Validator::make($data, [
             'id' => ['nullable', 'exists:references,id'],
             'referenceable_type' => ['required', 'string', 'max:255'],
-            'referenceable_id' => ['required', 
-                                    function ( $attribute, $value, $fail) use ($data) {
-                                        $referenceable = app($data['referenceable_type'])::find($value);
-                                        if ($referenceable === null) {
-                                            $fail("The {$attribute} is not a valid referenceable.");
-                                        }
-                                    }                    
-                                ],
+            'referenceable_id' => ['required',  new MorphId ],
             'referer_id' => ['required', 'exists:users,id'],
             'participation_level' => ['nullable', 'numeric', 'min:1', 'max:10'],
             'calc_config' => ['required', 'array'],

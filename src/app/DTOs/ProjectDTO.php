@@ -6,6 +6,7 @@ use App\Models\Project;
 use App\Rules\Money;
 use App\Rules\User\TeamMember;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 
 class ProjectDTO extends ModelDTO
@@ -20,9 +21,9 @@ class ProjectDTO extends ModelDTO
     public ?string $description;
     public int $service_id;
     public int $admin_id;
-    public ?string $start_at;
-    public ?string $completion_at;
-    public ?string $deliver_at;
+    public ?Carbon $start_at;
+    public ?Carbon $completion_at;
+    public ?Carbon $deliver_at;
     public float $committed_budget;
     public float $initial_payment;
     public int $priority_level;
@@ -58,9 +59,9 @@ class ProjectDTO extends ModelDTO
         $this->description = $data['description'] ?? null;
         $this->service_id = $data['service_id'];
         $this->admin_id = $data['admin_id'];
-        $this->start_at = $data['start_at'] ?? null;
-        $this->completion_at = $data['completion_at'] ?? null;
-        $this->deliver_at = $data['deliver_at'] ?? null;
+        $this->start_at = Carbon::make($data['start_at'] ?? null);
+        $this->completion_at = Carbon::make($data['completion_at'] ?? null);
+        $this->deliver_at = Carbon::make($data['deliver_at'] ?? null);
         $this->committed_budget = $data['committed_budget'];
         $this->initial_payment = $data['initial_payment'];
         $this->priority_level = $data['priority_level'] ?? 1;

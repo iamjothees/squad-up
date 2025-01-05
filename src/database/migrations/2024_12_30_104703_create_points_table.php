@@ -18,9 +18,10 @@ return new class extends Migration
         Schema::create('point_generations', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('points');
-            $table->string('generated_for'); // 'signup' | 'reference'
+            $table->string('generated_area'); // 'signup' | 'reference'
             $table->nullableMorphs('generator');
             $table->timestamp('credited_at')->nullable();
+            $table->timestamps();
             $table->softDeletes();
         });
 

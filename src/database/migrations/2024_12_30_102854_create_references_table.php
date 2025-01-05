@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('references', function (Blueprint $table) {
+            $table->id();
             $table->morphs('referenceable');
             $table->foreignId('referer_id')->nullable()->constrained('users');
             $table->unsignedTinyInteger('participation_level')->default(1);

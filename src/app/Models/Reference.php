@@ -9,6 +9,7 @@ class Reference extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
     protected $casts = [
         'calc_config' => 'array',
     ];
