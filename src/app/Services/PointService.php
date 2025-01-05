@@ -2,69 +2,105 @@
 
 namespace App\Services;
 
-use App\Models\Requirement;
+use App\DTOs\PointGenerationDTO;
+use App\DTOs\PointRedeemDTO;
+use App\DTOs\UserDTO;
+use App\Enums\Point\GenerationArea;
+use App\Interfaces\PointGeneratorDTO;
+use App\Jobs\SyncUserPoints;
+use App\Models\PointGeneration;
+use App\Models\PointRedeem;
+use App\PointConfig;
 use App\Settings\GeneralSettings;
-use Illuminate\Support\Number;
+use Exception;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class PointService
 {
-    public function __construct()
+    public function __construct( private PointConfig $pointsConfig, private GeneralSettings $generalSettings )
     {
         //
     }
 
-    public function createPointsForRequirement( Requirement $requirement, int $participationLevel = 1 ): void{
-        $requirement->point()->create([
-            'owner_id' => $requirement->referer_id,
-            'points' => $this->generatePoints(budget: $requirement->expecting_budget, participationLevel: $participationLevel),
-            'participation_level' => $participationLevel,
-            'calc_config' => app(GeneralSettings::class)->points_config
+    public function generate( GenerationArea $generationArea, ?PointGeneratorDTO $pointGeneratorDTO = null ): PointGenerationDTO {
+        $points = $this->getPoints( generationArea: $generationArea, pointGeneratorDTO: $pointGeneratorDTO );
+        
+        $pointGeneration = PointGeneration::create([
+            'points' => $points,
+            'generation_area' => $generationArea,
+            'generator_type' => $pointGeneratorDTO?->toModel()->getMorphClass(),
+            'generator_id' =>  $pointGeneratorDTO?->id,
         ]);
 
-        // Notify referer, owner
+        return PointGenerationDTO::fromModel($pointGeneration);
     }
 
-    public function updateOrCreatePointsForRequirement(Requirement $requirement, int $participationLevel = 1): void{
-        if($requirement->point){
-            $requirement->point->update([
-                'owner_id' => $requirement->referer_id,
-                'points' => $this->generatePoints( budget: $requirement->expecting_budget, participationLevel: $participationLevel, pointsConfig: $requirement->point->calc_config),
-                'participation_level' => $participationLevel
-            ]);
-
-            // Notify referer
-            return;
-        }
-
-        $this->createPointsForRequirement(requirement: $requirement);
-    }
-
-    public function destroyPoints(Requirement $requirement): void{
-        $requirement->point?->delete();
-
-        // Notify referer
-    }
-
-    
-
-    public function creditPoints(Requirement $requirement): void{
-        $requirement->point()->update([
-            'points' => $this->generatePoints($requirement->project->committed_budget, pointsConfig: $requirement->point->calc_config)
+    public function credit( PointGenerationDTO $pointGenerationDTO ): void{
+        $validator = Validator::make($pointGenerationDTO->toArray(), [
+            'credited_at' => ['null']
         ]);
 
-        // Notify referer
+        if ($validator->fails()) throw new Exception("Point already credited");
+        
+        DB::transaction(
+            function () use ($pointGenerationDTO) {
+                $pointGenerationDTO->toModel()->credited_at = now();
+                $pointGenerationDTO->toModel()->save();
+
+
+                SyncUserPoints::dispatch(
+                    userDTOs: collect()->push(UserDTO::fromModel( $pointGenerationDTO->toModel()->referal->referer ))
+                );
+            }
+        );
     }
 
+    public function requestForRedeem( UserDTO $userDTO, int $pointsQuantity ): void{
+        $validator = Validator::make(
+            data: [
+                'user' => $userDTO->toArray(),
+                'points_quantity' => $pointsQuantity
+            ], 
+            rules:[
+                'points_quantity' => [
+                    'lte:user.points', "min:{$this->generalSettings->least_redeemable_point}",
+                    fn ($attribute, $value, $fail) => (($value % $this->generalSettings->points_redeem_interval) !== 0) ? $fail("{$attribute} must be multiple of {$this->generalSettings->points_redeem_interval}") : null
+                ], 
+            ],
+            attributes: [
+                'user.points' => 'User points',
+                'points_quantity' => 'Points quantity'
+            ]
+        );
 
-    // TODO: points config to be DTO
-    private function generatePoints(float $budget, int $participationLevel = 1, ?array $pointsConfig = null): int{
-        $pointsConfig ??= app(GeneralSettings::class)->points_config;
-        $percent = collect($pointsConfig[$participationLevel] ?? [])
-            ->sortBy('least')
-            ->firstWhere(
-                fn ($item) =>  (($item['least'] ?? 0) <= $budget) && ($budget <= ($item['most'] ?? $budget))
-            )['percent'];
-    
-        return $budget * $percent;
+        if ($validator->fails()) throw new Exception($validator->errors()->first());
+
+        PointRedeem::create([
+            'owner_id' => $userDTO->id,
+            'points' => $pointsQuantity,            
+        ]);
+    }
+
+    public function redeem( PointRedeemDTO $pointRedeemDTO ): void {
+        $validator = Validator::make($pointRedeemDTO->toArray(), [
+            'redeemed_at' => ['null']
+        ]);
+
+        if ($validator->fails()) throw new Exception("Point already redeemed");
+
+        $pointRedeemDTO->toModel()->redeemed_at = now();
+        $pointRedeemDTO->toModel()->save();
+    }
+
+    public function calcPointsInAmount(float $amount, int $participationLevel = 1): float{
+        return $amount * ( $this->pointsConfig->getPercent( amount: $amount, participationLevel: $participationLevel ) / 100 );
+    }
+
+    private function getPoints( GenerationArea $generationArea, ?PointGeneratorDTO $pointGeneratorDTO = null ) {
+        return match($pointGeneratorDTO){
+            null => $generationArea->getPointsToGenerateInAmount(),
+            default => $pointGeneratorDTO->getPointsToGenerateInAmount()
+        } * $this->generalSettings->point_per_amount;
     }
 }

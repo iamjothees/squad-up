@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Casts\MoneyCast;
 use App\Enums\RequirementStatus;
+use App\Interfaces\PointGeneratorUsingConfig;
 use App\Observers\RequirementObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[ObservedBy([RequirementObserver::class])]
-class Requirement extends Model
+class Requirement extends Model implements PointGeneratorUsingConfig
 {
     use HasFactory, SoftDeletes;
 
@@ -29,10 +30,6 @@ class Requirement extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function referer(){
-        return $this->belongsTo(User::class);
-    }
-
     public function admin(){
         return $this->belongsTo(User::class);
     }
@@ -41,8 +38,16 @@ class Requirement extends Model
         return $this->belongsTo(Project::class);
     }
 
-    public function point(){
-        return $this->hasOne(Point::class);
+    public function reference(){
+        return $this->belongsTo(Reference::class);
+    }
+
+    public function pointGeneration(){
+        return $this->morphOne(PointGeneration::class, 'generator');
+    }
+
+    public function getAmountforPointCalculation(): float{
+        return $this->expecting_budget;
     }
 
 }

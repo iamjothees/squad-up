@@ -16,7 +16,7 @@ enum GenerationArea: string
         };
     }
 
-    public function getPointsInINR(): float{
+    public function getPointsToGenerateInAmount(): float{
         return match($this){
             default => 0
         };

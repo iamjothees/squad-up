@@ -2,10 +2,11 @@
 
 namespace App\DTOs;
 
+use App\Interfaces\PointGeneratorDTO;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 
-class UserDTO extends ModelDTO
+class UserDTO extends ModelDTO implements PointGeneratorDTO
 {
     use InteractsWithModelDTO;
 
@@ -22,6 +23,10 @@ class UserDTO extends ModelDTO
     public function __construct()
     {
         //
+    }
+
+    public function getPointsToGenerateInAmount(): int{
+        return $this->toModel()->getSignUpBonusInAmount();
     }
 
     protected function fill( array $data ): void{

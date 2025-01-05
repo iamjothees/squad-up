@@ -3,14 +3,16 @@
 namespace App\DTOs;
 
 use App\Enums\RequirementStatus;
+use App\Interfaces\PointGeneratorDTO;
 use App\Models\Requirement;
 use App\Rules\User\TeamMember;
+use App\Services\PointService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
-class RequirementDTO extends FilamentResourceDTO
+class RequirementDTO extends FilamentResourceDTO implements PointGeneratorDTO
 {
     use InteractsWithFilamentResourceDTO;
 
@@ -38,6 +40,11 @@ class RequirementDTO extends FilamentResourceDTO
         $data = $model->toArray();
         $data['status'] = RequirementStatus::from($data['status']);
         return self::fromArray($data);
+    }
+
+    public function getPointsToGenerateInAmount(): int{
+        $pointService = app(PointService::class);
+        return  $pointService->calcPointsInAmount( amount: $this->toModel()->getAmountforPointCalculation() );
     }
 
     protected function fill(array $data): void{

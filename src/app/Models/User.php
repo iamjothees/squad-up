@@ -4,8 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-use App\Enums\Point\GenerationArea;
 use App\Observers\UserObserver;
+use App\Settings\GeneralSettings;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -72,15 +72,10 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Project::class, 'owner_id');
     }
 
-    public function points(){
-        return $this->hasMany(Point::class, 'owner_id');
+    public function getSignUpBonusInAmount(): int{
+        $settings = app(GeneralSettings::class);
+        return $settings->signup_bonus_points
+            ? $settings->signup_bonus_points / $settings->point_per_amount
+            : 50;
     }
-
-    // public function getCurrentPointsAttribute(){
-    //     return $this
-    //     $this->points()
-    //         ->where(
-    //             fn ($q) => $q->where('generated_area', GenerationArea::SIGNUP)->
-    //         )
-    // }
 }
