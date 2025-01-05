@@ -2,12 +2,15 @@
 
 namespace App\DTOs;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 trait InteractsWithModelDTO
 {
     public static function fromModel(Model $model): self{
-        return self::fromArray($model->attributesToArray());
+        $self = self::fromArray($model->attributesToArray());
+        $self->model = $model;
+        return $self;
     }
 
     public static function fromArray(array $data): self{
@@ -16,8 +19,11 @@ trait InteractsWithModelDTO
         return $dto;
     }
 
-    public function toModel(): Model{
-        return $this->model ??= app($this->modelType)::find($this->id);
+    public function toModel(): ?Model{
+        if(is_null($this->id)) return null;
+
+        $model = $this->model ??= app($this->modelType)::make( [ ...$this->toCreateArray(), 'id' => $this->id ] );
+        return $model;
     }
 
     public function toArray(): array{
@@ -26,5 +32,15 @@ trait InteractsWithModelDTO
 
     public function toCreateArray(): array{
         return collect($this->toArray())->except('id')->toArray();
+    }
+
+    // TODO: need fix
+    public function refresh(): self{
+        if(!$this->model){
+            $this->toModel();
+            return $this;
+        }
+        $this->model->refresh();
+        return $this;
     }
 }

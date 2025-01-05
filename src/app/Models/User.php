@@ -72,6 +72,14 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Project::class, 'owner_id');
     }
 
+    public function points(){
+        return $this->hasMany(PointGeneration::class, 'owner_id');
+    }
+
+    public function redeems(){
+        return $this->hasMany(PointRedeem::class, 'owner_id');
+    }
+
     public function getSignUpBonusInAmount(): int{
         $settings = app(GeneralSettings::class);
         return $settings->signup_bonus_points

@@ -10,6 +10,7 @@ use App\Interfaces\PointGeneratorDTO;
 use App\Jobs\SyncUserPoints;
 use App\Models\PointGeneration;
 use App\Models\PointRedeem;
+use App\Models\User;
 use App\PointConfig;
 use App\Settings\GeneralSettings;
 use Exception;
@@ -24,10 +25,11 @@ class PointService
     }
 
     public function generate( GenerationArea $generationArea, ?PointGeneratorDTO $pointGeneratorDTO = null ): PointGenerationDTO {
-        $points = $this->getPoints( generationArea: $generationArea, pointGeneratorDTO: $pointGeneratorDTO );
+        $points = $this->getPointsToGenerate( generationArea: $generationArea, pointGeneratorDTO: $pointGeneratorDTO );
         
         $pointGeneration = PointGeneration::create([
             'points' => $points,
+            'owner_id' => $pointGeneratorDTO?->getPointOwnerId(),
             'generation_area' => $generationArea,
             'generator_type' => $pointGeneratorDTO?->toModel()->getMorphClass(),
             'generator_id' =>  $pointGeneratorDTO?->id,
@@ -38,22 +40,19 @@ class PointService
 
     public function credit( PointGenerationDTO $pointGenerationDTO ): void{
         $validator = Validator::make($pointGenerationDTO->toArray(), [
-            'credited_at' => ['null']
+            'credited_at' => [
+                fn ($attribute, $value, $fail) => (!is_null($value)) ? $fail("{$attribute} must be null") : null 
+            ]
         ]);
 
         if ($validator->fails()) throw new Exception("Point already credited");
         
-        DB::transaction(
-            function () use ($pointGenerationDTO) {
-                $pointGenerationDTO->toModel()->credited_at = now();
-                $pointGenerationDTO->toModel()->save();
+        $pointGenerationDTO->toModel()->credited_at = now();
+        $pointGenerationDTO->toModel()->save();
 
 
-                SyncUserPoints::dispatch(
-                    userDTOs: collect()->push(UserDTO::fromModel( $pointGenerationDTO->toModel()->referal->referer ))
-                );
-            }
-        );
+        $userDTO = UserDTO::fromModel( User::find($pointGenerationDTO->owner_id) );
+        SyncUserPoints::dispatch( userDTOs: collect()->push( $userDTO ) );
     }
 
     public function requestForRedeem( UserDTO $userDTO, int $pointsQuantity ): void{
@@ -97,7 +96,15 @@ class PointService
         return $amount * ( $this->pointsConfig->getPercent( amount: $amount, participationLevel: $participationLevel ) / 100 );
     }
 
-    private function getPoints( GenerationArea $generationArea, ?PointGeneratorDTO $pointGeneratorDTO = null ) {
+    public function getUserCurrrentPoints(UserDTO $userDTO): float{
+        $user = $userDTO->toModel();
+        $creditedPoints = (int) $user->points()->credited()->sum('points');
+        $redeemedPoints = (int) $user->redeems()->sum('points');
+        
+        return $creditedPoints - $redeemedPoints;
+    }
+
+    private function getPointsToGenerate( GenerationArea $generationArea, ?PointGeneratorDTO $pointGeneratorDTO = null ) {
         return match($pointGeneratorDTO){
             null => $generationArea->getPointsToGenerateInAmount(),
             default => $pointGeneratorDTO->getPointsToGenerateInAmount()

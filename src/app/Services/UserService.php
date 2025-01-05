@@ -2,22 +2,25 @@
 
 namespace App\Services;
 
-use App\Enums\RequirementStatus;
+use App\DTOs\UserDTO;
+use App\Enums\Point\GenerationArea;
 use App\Models\User;
 
 class UserService
 {
-    public function __construct()
+    public function __construct( protected PointService $pointService )
     {
         //
     }
 
-    public function getExpectingPoints(User $user): int{
-        return $user->points()->expecting()->sum('points');
+    public function creditSignupBonusPoints(UserDTO $userDTO): void{
+        $this->pointService->credit( 
+            pointGenerationDTO: $this->pointService->generate( generationArea: GenerationArea::SIGNUP, pointGeneratorDTO: $userDTO ) 
+        );
     }
 
-    public function getCurrentPoints(User $user): int{
-        return $user->currentPoints();
+    public function getExpectingPoints(User $user): int{
+        return $user->points()->nonCredited()->sum('points');
     }
 
     public function generateReferalPartnerCode(User $user){
@@ -28,5 +31,11 @@ class UserService
                     : rand(1000, 9999);
 
         return "RPC-{$id}-{$suffix}";
+    }
+
+    public function syncCurrentPoints(UserDTO $userDTO): UserDTO{
+        $userDTO->toModel()->current_points = $this->pointService->getUserCurrrentPoints(userDTO: $userDTO);
+        $userDTO->toModel()->push();
+        return $userDTO;
     }
 }

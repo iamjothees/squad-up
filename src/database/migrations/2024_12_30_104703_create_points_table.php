@@ -12,12 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->unsignedInteger('points')->default(0);
+        $table->unsignedInteger('current_points')->default(0);
         });
 
         Schema::create('point_generations', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('points');
+            $table->foreignId('owner_id')->constrained('users');
             $table->string('generation_area'); // 'signup' | 'reference'
             $table->nullableMorphs('generator');
             $table->timestamp('credited_at')->nullable();
@@ -27,7 +28,7 @@ return new class extends Migration
 
         Schema::create('point_redeems', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('owner_id')->constrained('users')->unique();
+            $table->foreignId('owner_id')->constrained('users');
             $table->unsignedInteger('points');
             $table->timestamp('redeemed_at')->nullable();
             $table->timestamps();

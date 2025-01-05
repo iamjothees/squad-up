@@ -18,7 +18,7 @@ class UserDTO extends ModelDTO implements PointGeneratorDTO
     public ?string $email;
     public ?string $phone;
     public string $password;
-    public int $points;
+    public int $current_points;
 
     public function __construct()
     {
@@ -29,6 +29,10 @@ class UserDTO extends ModelDTO implements PointGeneratorDTO
         return $this->toModel()->getSignUpBonusInAmount();
     }
 
+    public function getPointOwnerId(): int{
+        return $this->toModel()->id;
+    }
+
     protected function fill( array $data ): void{
         $data['id'] ??= null;
         $validator = Validator::make($data, [
@@ -37,7 +41,7 @@ class UserDTO extends ModelDTO implements PointGeneratorDTO
             'email' => ['required_if:phone,null', 'string', 'email', 'max:255', 'unique:users,email,' . $data['id']],
             'phone' => ['required_if:email,null', 'string', 'max:255', 'unique:users,phone,' . $data['id']],
             'password' => ['required', 'string', 'min:8'],
-            'points' => ['nullable', 'numeric', 'min:0'],
+            'current_points' => ['nullable', 'numeric', 'min:0'],
         ]);
 
         if ($validator->fails()) {
@@ -49,6 +53,6 @@ class UserDTO extends ModelDTO implements PointGeneratorDTO
         $this->email = $data['email'] ?? null;
         $this->phone = $data['phone'] ?? null;
         $this->password = $data['password'];
-        $this->points = $data['points'] ?? 0;
+        $this->current_points = $data['current_points'] ?? 0;
     }
 }

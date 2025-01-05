@@ -3,6 +3,7 @@
 namespace App\Enums\Point;
 
 use App\Models\Requirement;
+use App\Models\User;
 
 enum GenerationArea: string
 {
@@ -11,7 +12,8 @@ enum GenerationArea: string
 
     public function generatorKey(): string|null{
         return match($this){
-            self::REQUIREMENT => Requirement::class,
+            self::REQUIREMENT => app(Requirement::class)->getMorphClass(),
+            self::SIGNUP => app(User::class)->getMorphClass(),
             default => null,
         };
     }

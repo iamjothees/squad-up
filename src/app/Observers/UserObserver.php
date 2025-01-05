@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\DTOs\UserDTO;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Support\Facades\Context;
@@ -22,6 +23,8 @@ class UserObserver
     public function created(User $user): void
     {
         $this->handleReferalPartnerCode($user);
+
+        $this->userService->creditSignupBonusPoints(userDTO: UserDTO::fromModel($user));
     }
 
     /**

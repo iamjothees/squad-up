@@ -37,14 +37,20 @@ class RequirementDTO extends FilamentResourceDTO implements PointGeneratorDTO
     }
 
     public static function fromModel(Model $model): self{
-        $data = $model->toArray();
-        $data['status'] = RequirementStatus::from($data['status']);
-        return self::fromArray($data);
+        $data = $model->attributesToArray();
+        $data['status'] = $model->status;
+        $self = self::fromArray($data);
+        $self->model = $model;
+        return $self;
     }
 
     public function getPointsToGenerateInAmount(): int{
         $pointService = app(PointService::class);
         return  $pointService->calcPointsInAmount( amount: $this->toModel()->getAmountforPointCalculation() );
+    }
+
+    public function getPointOwnerId(): int{
+        return $this->toModel()->getPointOwnerId();
     }
 
     protected function fill(array $data): void{

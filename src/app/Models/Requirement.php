@@ -50,4 +50,8 @@ class Requirement extends Model implements PointGeneratorUsingConfig
         return $this->expecting_budget;
     }
 
+    public function getPointOwnerId(): ?int{
+        return $this->reference?->referer_id;
+    }
+
 }

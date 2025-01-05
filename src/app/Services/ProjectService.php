@@ -2,12 +2,14 @@
 
 namespace App\Services;
 
+use App\DTOs\PointGenerationDTO;
 use App\DTOs\ProjectDTO;
+use App\Enums\Point\GenerationArea;
 use App\Models\Project;
 
 class ProjectService
 {
-    public function __construct()
+    public function __construct( private PointService $pointService )
     {
         //
     }
@@ -16,6 +18,10 @@ class ProjectService
         $project = Project::create($projectDTO->toCreateArray());
 
         // TODO: crediting points
+        if ( $project->requirement?->reference ){
+            $this->pointService->credit( pointGenerationDTO: PointGenerationDTO::fromModel($project->requirement->pointGeneration) );
+        }
+
         // TODO: notify owner
         return ProjectDTO::fromModel($project);
     }

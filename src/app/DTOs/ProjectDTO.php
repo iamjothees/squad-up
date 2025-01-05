@@ -2,16 +2,13 @@
 
 namespace App\DTOs;
 
-use App\Interfaces\PointGeneratorDTO;
 use App\Models\Project;
 use App\Rules\Money;
 use App\Rules\User\TeamMember;
-use App\Services\PointService;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 
-class ProjectDTO extends ModelDTO implements PointGeneratorDTO
+class ProjectDTO extends ModelDTO
 {
     use InteractsWithModelDTO;
 
@@ -33,11 +30,6 @@ class ProjectDTO extends ModelDTO implements PointGeneratorDTO
     public function __construct()
     {
         //
-    }
-
-    public function getPointsToGenerateInAmount(): int{
-        $pointService = app(PointService::class);
-        return  $pointService->calcPointsInAmount( amount: $this->committed_budget );
     }
 
     protected function fill(array $data): void{
