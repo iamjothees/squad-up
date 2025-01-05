@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 trait InteractsWithModelDTO
 {
     public static function fromModel(Model $model): self{
-        return self::fromArray($model->toArray());
+        return self::fromArray($model->attributesToArray());
     }
 
     public static function fromArray(array $data): self{

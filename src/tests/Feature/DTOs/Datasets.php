@@ -1,6 +1,7 @@
 <?php
 
 use App\DTOs\ProjectDTO;
+use App\DTOs\ReferenceDTO;
 use App\DTOs\RequirementDTO;
 use App\Enums\RequirementStatus;
 use App\Enums\ServiceStatus;
@@ -8,6 +9,7 @@ use App\Models\Project;
 use App\Models\Requirement;
 use App\Models\Service;
 use App\Models\User;
+use App\Settings\GeneralSettings;
 
 dataset(
     'dtosForFromArray',
@@ -38,6 +40,26 @@ dataset(
                 'status' => RequirementStatus::PENDING,
             ],
         ],
+        [
+            ReferenceDTO::class,
+            fn () => [
+                'referenceable_type' => Requirement::class,
+                'referenceable_id' => Requirement::factory()->create()->id,
+                'referer_id' => User::factory()->create()->id,
+                'participation_level' => 1,
+                'calc_config' => (new GeneralSettings())->points_config,
+            ]
+        ],
+        [
+            ReferenceDTO::class,
+            fn () => [
+                'referenceable_type' => Requirement::class,
+                'referenceable_id' => Requirement::factory()->create()->id,
+                'referer_id' => User::factory()->create()->id,
+                'participation_level' => 1,
+                'calc_config' => (new GeneralSettings())->points_config,
+            ]
+        ]
     ]
 );
 
