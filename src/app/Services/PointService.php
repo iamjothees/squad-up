@@ -68,14 +68,17 @@ class PointService
     }
 
     public function requestForRedeem( UserDTO $userDTO, int $points ): PointRedeemDTO{
-
         // Validations for first redeem
+        // dd($userDTO->toModel()->points()->credited()->whereNot( 'generation_area', GenerationArea::SIGNUP)->exists());
         if ( 
-            !$userDTO->toModel()->redeems  // is first request
-            && !$userDTO->toModel()->points()->credited()->whereNot( 'generation_area', GenerationArea::SIGNUP)->exists() // does have any other point generation other thsn signup
-        ) throw new Exception("First redeem request validations not meet up");
+            $userDTO->toModel()->redeems->empty()  // is first request
+            && 
+            (!$userDTO->toModel()->points()->credited()->whereNot( 'generation_area', GenerationArea::SIGNUP)->exists()) // does have any other point generation other thsn signup
+        ) {
+            throw new Exception("First redeem request validations not meet up");
+        }
 
-        // Other validations
+        // Point validations
         $validator = Validator::make(
             data: [
                 'user' => $userDTO->toArray(),
@@ -102,7 +105,7 @@ class PointService
                     'points' => $points,            
                 ]);
 
-                $userDTO->current_points -= $points;
+                $userDTO->toModel()->current_points -= $points;
                 $userDTO->toModel()->save();
 
                 return $pointRedeem;
