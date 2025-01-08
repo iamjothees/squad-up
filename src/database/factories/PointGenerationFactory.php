@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Enums\Point\GenerationArea;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class PointGenerationFactory extends Factory
 {
@@ -13,8 +14,8 @@ class PointGenerationFactory extends Factory
             'points' => fake()->numberBetween(50, 2500) * 100,
             'generation_area' => fake()->randomElement(GenerationArea::cases()),
             'generator_type' => fn (array $attributes) => $attributes['generation_area']->generatorKey(),
-            'generator_id' => fn (array $attributes) => $attributes['generator_type'] ? $attributes['generator_type']::factory()->create()->id : null,
-            'credited_at' => fake()->dateTimeBetween('-1 year', 'now'),
+            'generator_id' => fn (array $attributes) => $attributes['generator_type'] ? Relation::getMorphedModel($attributes['generator_type'])::factory()->create()->id : null,
+            'credited_at' => fake()->boolean() ? fake()->dateTimeBetween('-1 year', 'now') : null,
         ];
     }
 }

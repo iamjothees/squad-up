@@ -2,18 +2,19 @@
 
 namespace App\Enums\Point;
 
+use App\Models\Reference;
 use App\Models\Requirement;
 use App\Models\User;
 
 enum GenerationArea: string
 {
-    case REQUIREMENT = 'requirement';
     case SIGNUP = 'signup';
+    case REFERENCE = 'reference';
 
     public function generatorKey(): string|null{
         return match($this){
-            self::REQUIREMENT => app(Requirement::class)->getMorphClass(),
             self::SIGNUP => app(User::class)->getMorphClass(),
+            self::REFERENCE => app(Reference::class)->getMorphClass(),
             default => null,
         };
     }

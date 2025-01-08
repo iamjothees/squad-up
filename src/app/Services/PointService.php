@@ -14,7 +14,6 @@ use App\Models\User;
 use App\PointConfig;
 use App\Settings\GeneralSettings;
 use Exception;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class PointService
@@ -33,8 +32,8 @@ class PointService
             'generation_area' => $generationArea,
             'generator_type' => $pointGeneratorDTO?->toModel()->getMorphClass(),
             'generator_id' =>  $pointGeneratorDTO?->id,
+            'calc_config' => $this->generalSettings->points_config
         ]);
-
         return PointGenerationDTO::fromModel($pointGeneration);
     }
 
@@ -53,6 +52,18 @@ class PointService
 
         $userDTO = UserDTO::fromModel( User::find($pointGenerationDTO->owner_id) );
         SyncUserPoints::dispatch( userDTOs: collect()->push( $userDTO ) );
+    }
+
+    public function destroy( PointGenerationDTO $pointGenerationDTO ): void{
+        $validator = Validator::make($pointGenerationDTO->toArray(), [
+            'credited_at' => [
+                fn ($attribute, $value, $fail) => (!is_null($value)) ? $fail("{$attribute} must not be null") : null 
+            ]
+        ]);
+
+        if ($validator->fails()) throw new Exception("Cannot destroy! Point Already credited");
+
+        $pointGenerationDTO->toModel()->delete();
     }
 
     public function requestForRedeem( UserDTO $userDTO, int $pointsQuantity ): void{
@@ -96,7 +107,7 @@ class PointService
         return $amount * ( $this->pointsConfig->getPercent( amount: $amount, participationLevel: $participationLevel ) / 100 );
     }
 
-    public function getUserCurrrentPoints(UserDTO $userDTO): float{
+    public function getUserCurrentPoints(UserDTO $userDTO): float{
         $user = $userDTO->toModel();
         $creditedPoints = (int) $user->points()->credited()->sum('points');
         $redeemedPoints = (int) $user->redeems()->sum('points');
@@ -104,7 +115,7 @@ class PointService
         return $creditedPoints - $redeemedPoints;
     }
 
-    private function getPointsToGenerate( GenerationArea $generationArea, ?PointGeneratorDTO $pointGeneratorDTO = null ) {
+    private function getPointsToGenerate( GenerationArea $generationArea, ?PointGeneratorDTO $pointGeneratorDTO = null ): int {
         return match($pointGeneratorDTO){
             null => $generationArea->getPointsToGenerateInAmount(),
             default => $pointGeneratorDTO->getPointsToGenerateInAmount()

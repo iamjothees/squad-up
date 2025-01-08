@@ -2,6 +2,7 @@
 
 namespace App\Filament\User\Pages;
 
+use App\Models\User;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\TextEntry\TextEntrySize;
 use Filament\Infolists\Infolist;
@@ -14,6 +15,8 @@ class ReferalPartnerCode extends Page
     protected static ?int $navigationSort = 2;
 
     protected static string $view = 'filament.user.pages.referal-partner-code';
+
+    public User $user;
 
     public function infolist(Infolist $infolist): Infolist
     {
@@ -29,5 +32,9 @@ class ReferalPartnerCode extends Page
                     ->icon('icon-clipboard')
                     ->iconPosition('after'),
             ]);
+    }
+
+    public function mount(){
+        $this->user = auth()->user();
     }
 }

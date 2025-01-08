@@ -20,8 +20,6 @@ class SyncUserPoints implements ShouldQueue
     public function handle(): void
     {
         $userService = app(UserService::class);
-        if ($this->userDTOs->first()->toModel()->current_points)
-            dd($this->userDTOs);
         $this->userDTOs->each(fn(UserDTO $userDTO) => $userService->syncCurrentPoints(userDTO: $userDTO));
     }
 }

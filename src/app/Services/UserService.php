@@ -23,6 +23,10 @@ class UserService
         return $user->points()->nonCredited()->sum('points');
     }
 
+    public function getCurrentPoints(User $user): int{
+        return $user->points()->credited()->sum('points');
+    }
+
     public function generateReferalPartnerCode(User $user){
         $id = str_pad($user->id, 3, '0', STR_PAD_LEFT);
 
@@ -34,7 +38,7 @@ class UserService
     }
 
     public function syncCurrentPoints(UserDTO $userDTO): UserDTO{
-        $userDTO->toModel()->current_points = $this->pointService->getUserCurrrentPoints(userDTO: $userDTO);
+        $userDTO->toModel()->current_points = $this->pointService->getUserCurrentPoints(userDTO: $userDTO);
         $userDTO->toModel()->push();
         return $userDTO;
     }

@@ -7,7 +7,7 @@ uses(Tests\TestCase::class);
 
 test('it_generates_a_referal_partner_code', function () {
     // Arrange
-    $userService = new UserService();
+    $userService = app(UserService::class);
     $user = User::factory()->make(['id' => 21]);
 
     // Act

@@ -2,27 +2,79 @@
 
 namespace App\Services;
 
+use App\DTOs\ReferenceDTO;
+use App\DTOs\RequirementDTO;
 use App\Enums\RequirementStatus;
 use App\Models\Project;
 use App\Models\Requirement;
 use App\Models\User;
+use App\Settings\GeneralSettings;
+
+//
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Resources\Components\Tab;
 use Filament\Tables;
+use Filament\Tables\Columns\Layout\Panel;
+//
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Number;
 use Illuminate\Validation\Rule;
+use Nette\Utils\Html;
 
 class RequirementService
 {
-    public function __construct()
+    public function __construct(  private PointService $pointService, private GeneralSettings $generalSettings, private ReferenceService $referenceService )
     {
         //
     }
 
-    public function generateReferalCode(Requirement $requirement): string{
-        return "REQ-".str($requirement->id)->padLeft(4, '0')."-" . str(str()->uuid())->take(4)->upper();
+    public function createRequirement(RequirementDTO $requirementDTO): RequirementDTO{
+
+        return DB::transaction(function () use ($requirementDTO){
+            // creates requirement
+            $requirementDTO->referal_code = str()->uuid();
+            $requirement = Requirement::create( $requirementDTO->toCreateArray() );
+            
+            // generates referal code
+            $requirementDTO->id = $requirement->id;
+            $requirement->referal_code = app(RequirementService::class)->generateReferalCode(requirementDTO: $requirementDTO);
+            $requirement->save();
+    
+            // creates reference
+            if ($requirementDTO->referer_id){
+                $referenceDTO = ReferenceDTO::fromArray([ 'referenceable' => $requirement, 'referer_id' => $requirementDTO->referer_id, ]);
+                $this->referenceService->createReference(referenceDTO: $referenceDTO, hasPoints: true);
+            }
+            return $requirementDTO;
+        });
+    }
+
+    public function updateRequirement(RequirementDTO $requirementDTO): RequirementDTO{
+        return DB::transaction(function () use ($requirementDTO){
+            // updates requirement
+            $requirement = $requirementDTO->toModel();
+            $requirement->fill($requirementDTO->toUpdateArray());
+            $requirement->push();
+    
+            if ($requirement->reference){
+                $this->referenceService->destroyReference(referenceDTO: ReferenceDTO::fromModel($requirement->reference));
+            }
+    
+            if ($requirementDTO->referer_id){
+                $referenceDTO = ReferenceDTO::fromArray([ 'referenceable' => $requirement, 'referer_id' => $requirementDTO->referer_id, ]);
+                $this->referenceService->createReference(referenceDTO: $referenceDTO, hasPoints: true);
+            }
+            $requirementDTO->refreshModel();
+            return $requirementDTO;
+        });
+    }
+
+    public function generateReferalCode(RequirementDTO $requirementDTO): string{
+        return "REQ-".str($requirementDTO->id)->padLeft(4, '0')."-" . str(str()->uuid())->take(4)->upper();
     }
 
     public function accept(Requirement $requirement): Requirement{
@@ -31,8 +83,6 @@ class RequirementService
         $requirement->status = RequirementStatus::IN_PROGRESS;
         $requirement->admin_id = auth()->id();
         $requirement->save();
-
-        // app(PointService::class)->updateOrCreatePoints(requirement: $requirement);
 
         return $requirement;    
     }
@@ -67,22 +117,22 @@ class RequirementService
         return $project;
     }
 
-    public function createPoints( Requirement $requirement ){
-        // app(PointService::class)->createPoints(requirement: $requirement);
+    private function handleReference(Requirement $requirement, RequirementDTO $requirementDTO){
+        if ($requirement->reference){
+            $requirement->reference->delete();
+        }
+
+        if ($requirementDTO->referer_id){
+            $referenceDTO = ReferenceDTO::fromArray([
+                'referenceable' => $requirement,
+                'referer_id' => $requirementDTO->referer_id,
+            ]);
+            app(ReferenceService::class)->createReference(referenceDTO: $referenceDTO, hasPoints: true);
+        }
     }
 
-    public function updateOrCreatePoints( Requirement $requirement ){
-        // app(PointService::class)->updateOrCreatePoints(requirement: $requirement);
-    }
 
-    public function destroyPoints( Requirement $requirement ){
-        // app(PointService::class)->destroyPoints(requirement: $requirement);
-    }
-
-    public function creditPoints( Requirement $requirement ){
-        // app(PointService::class)->creditPoints(requirement: $requirement);
-    }
-
+    // For Filament
     public static function getEloquentQuery(Builder $query): Builder{
         return $query
             ->whereNot('status', RequirementStatus::APPROVED)
@@ -95,12 +145,13 @@ class RequirementService
                 ),
                 fn (Builder $query) => $query->where(
                     fn ($q) => $q->where('owner_id', auth()->id())
-                                ->orWhereHas(  'refererence', fn ($q) => $q->where('referer_id', auth()->id()) )
+                                ->orWhereHas(  'reference', fn ($q) => $q->where('referer_id', auth()->id()) )
                 )
             );
     }
 
     public static function getFormSchema(): array{
+
         return [
             Forms\Components\Select::make('owner_id')
                 ->label('Owner')
@@ -108,7 +159,7 @@ class RequirementService
                 ->required()
                 ->preload(config('app.env') === 'local')
                 ->searchable()
-                ->visible(auth()->user()->hasRole('admin')),
+                ->visible(fn ($state) => auth()->id() != $state),
             Forms\Components\Select::make('service_id')
                 ->label('Service')
                 ->relationship('service', 'name', fn (Builder $query) => $query->active())
@@ -117,7 +168,7 @@ class RequirementService
                 ->searchable()
                 ->default(1)
                 ->columnStart(1),
-            Forms\Components\TextInput::make('expecting_budget')
+            Forms\Components\TextInput::make('budget')
                 ->required()
                 ->hint(fn ($state) => Number::currency($state ?? 0) )
                 ->prefix('₹')
@@ -137,7 +188,7 @@ class RequirementService
                     Rule::exists('users', 'referal_partner_code')
                             ->where( fn ($q) => $q->whereNot('id', auth()->id()) )
                 ])
-                ->visible(!auth()->user()->hasRole('admin')),
+                ->visible(Filament::getCurrentPanel()->getId() !== 'admin'),
             Forms\Components\Select::make('referer_id') // TODO: handle reference creation
                 ->label("Referer")
                 ->options(User::pluck('name', 'id'))
@@ -148,13 +199,13 @@ class RequirementService
                     'not_in' => 'You cannot refer yourself'
                 ])
                 ->searchable()
-                ->visible(auth()->user()->hasRole('admin')),
+                ->visible( fn () => Filament::getCurrentPanel()->getId() === 'admin'),
             Forms\Components\Select::make('admin_id')
                 ->label("Known Team member")
                 ->relationship('admin', 'name', fn (Builder $query) => $query->onlyTeamMembers() )
                 ->preload()
                 ->searchable(),
-            Forms\Components\DateTimePicker::make('expecting_delivery_at')
+            Forms\Components\DateTimePicker::make('completion_at')
                 ->seconds(false)
                 ->label('Expected Delivery Date Time'),
         ];
@@ -167,19 +218,34 @@ class RequirementService
                 ->searchable(),
             Tables\Columns\TextColumn::make('owner.name')
                 ->label("Owner")
-                ->description(fn ($record) => auth()->user()->hasRole('admin') ? ($record->owner?->phone ?? $record->owner?->email) : '')
-                ->visible(auth()->user()->hasRole('admin')),
+                ->description(fn ($record) => Filament::getPanel() === 'admin' ? ($record->owner?->phone ?? $record->owner?->email) : '')
+                ->visible(fn ($record) => auth()->user() != $record?->owner),
             Tables\Columns\TextColumn::make('admin.name')
                 ->label("Known Team member"),
-            // Tables\Columns\TextColumn::make('referer.name') // TODO references
-            //     ->description(fn ($record) => auth()->user()->hasRole('admin') ? ($record->referer?->phone ?? $record->referer?->email) : ''),
+            Tables\Columns\TextColumn::make('reference.referer.name')
+                ->description(fn ($record) => Filament::getPanel() === 'admin' ? ($record->referer?->phone ?? $record->referer?->email) : '')
+                ->hidden(fn ($record) => $record?->reference?->referer === auth()->user()),
             Tables\Columns\TextColumn::make('expecting_delivery_at')
                 ->label('Expected Delivery Date Time')
-                ->dateTime('d-m-Y h:i A'),
-            Tables\Columns\TextColumn::make('expecting_budget')
+                ->dateTime('d-m-Y h:i A')
+                ->toggleable(isToggledHiddenByDefault: true),
+            Tables\Columns\TextColumn::make('budget')
+                ->label("Expecting Budget")
                 ->money('INR')
                 ->alignEnd()
                 ->sortable(),
+            Tables\Columns\TextColumn::make('reference.pointGeneration.points')
+                ->label("Your share")
+                ->formatStateUsing(
+                    // fn ($state) => "<x-points points='{$state}' />"
+                    fn ($state) => $state
+                )
+                ->alignEnd()
+                ->sortable()
+                ->html()
+                ->visible(
+                    fn () => Filament::getCurrentPanel()->getId() === 'user' && Route::currentRouteName() === 'filament.user.resources.requirements.refered'
+                ),
             Tables\Columns\TextColumn::make('created_at')
                 ->dateTime()
                 ->sortable()
@@ -205,5 +271,10 @@ class RequirementService
             'rejected' => Tab::make()
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('status', RequirementStatus::REJECTED)),
         ];
+    }
+
+    public function mutateFormDataBeforeFill(array $data, Requirement $requirement): array{
+        $data['referal_partner_code'] ??= User::find($requirement->referer_id, ['referal_partner_code'])?->referal_partner_code;
+        return $data;
     }
 }

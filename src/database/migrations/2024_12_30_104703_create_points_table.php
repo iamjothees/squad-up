@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignId('owner_id')->constrained('users');
             $table->string('generation_area'); // 'signup' | 'reference'
             $table->nullableMorphs('generator');
+            $table->json('calc_config')->nullable();
             $table->timestamp('credited_at')->nullable();
             $table->timestamps();
             $table->softDeletes();

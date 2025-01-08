@@ -22,20 +22,24 @@ trait InteractsWithModelDTO
     public function toModel(): ?Model{
         if(is_null($this->id)) return null;
 
-        $model = $this->model ??= app($this->modelType)::make( [ ...$this->toCreateArray(), 'id' => $this->id ] );
+        $model = $this->model ??= app($this->modelType)::find( $this->id );
         return $model;
     }
 
     public function toArray(): array{
-        return collect($this)->toArray();
+        return collect(get_object_vars($this))->except(['model', 'modelType'])->toArray();
     }
 
     public function toCreateArray(): array{
         return collect($this->toArray())->except('id')->toArray();
     }
 
+    public function toUpdateArray(): array{
+        return collect($this->toArray())->except('id')->filter(fn ($value) => !is_null($value))->toArray();
+    }
+
     // TODO: need fix
-    public function refresh(): self{
+    public function refreshModel(): self{
         if(!$this->model){
             $this->toModel();
             return $this;

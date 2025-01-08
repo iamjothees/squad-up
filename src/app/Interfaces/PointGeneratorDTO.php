@@ -7,6 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 interface PointGeneratorDTO
 {
     public function toModel(): ?Model;
-    public function getPointsToGenerateInAmount(): int;
+    public function getPointsToGenerateInAmount(): float;
     public function getPointOwnerId(): int;
 }

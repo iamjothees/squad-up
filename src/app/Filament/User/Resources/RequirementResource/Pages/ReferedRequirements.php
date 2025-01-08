@@ -18,6 +18,6 @@ class ReferedRequirements extends ListRecords
 
     protected function getTableQuery(): ?Builder
     {
-        return RequirementResource::getEloquentQuery()->where('referer_id', auth()->id());
+        return RequirementResource::getEloquentQuery()->whereHas('reference', fn ($q) => $q->where('referer_id', auth()->id()));
     }
 }

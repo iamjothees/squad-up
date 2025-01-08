@@ -19,7 +19,7 @@ class ProjectService
 
         // TODO: crediting points
         if ( $project->requirement?->reference ){
-            $this->pointService->credit( pointGenerationDTO: PointGenerationDTO::fromModel($project->requirement->pointGeneration) );
+            $this->pointService->credit( pointGenerationDTO: PointGenerationDTO::fromModel($project->requirement->reference->pointGeneration) );
         }
 
         // TODO: notify owner

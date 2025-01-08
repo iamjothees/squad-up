@@ -5,6 +5,7 @@ namespace App\DTOs;
 use App\Enums\Point\GenerationArea;
 use App\Models\PointGeneration;
 use App\Rules\MorphId;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -22,11 +23,20 @@ class PointGenerationDTO extends ModelDTO
     public GenerationArea $generation_area;
     public ?string $generator_type;
     public ?int $generator_id;
+    public ?array $calc_config;
     public ?Carbon $credited_at;
 
     public function __construct()
     {
         //
+    }
+
+    public static function fromModel(Model $model): self{
+        $data = $model->attributesToArray();
+        $data['generation_area'] = $model->generation_area;
+        $self = self::fromArray($data);
+        $self->model = $model;
+        return $self;
     }
 
     public function fill( array $data ): void{
@@ -37,6 +47,7 @@ class PointGenerationDTO extends ModelDTO
             'generation_area' => ['required', Rule::enum(GenerationArea::class)],
             'generator_type' => ['nullable', 'string', 'max:255', Rule::in([ $data['generation_area']->generatorKey() ])],
             'generator_id' => ['nullable', new MorphId ], // TODO: validate generator's getOwnerId matches owner_id
+            'calc_config' => ['nullable', 'array'],
             'credited_at' => ['nullable', 'date', 'before_or_equal:now'],
         ]);
 
@@ -50,6 +61,7 @@ class PointGenerationDTO extends ModelDTO
         $this->generation_area = $data['generation_area'];
         $this->generator_type = $data['generator_type'] ?? null;
         $this->generator_id = $data['generator_id'] ?? null;
+        $this->calc_config = $data['calc_config'] ?? null;
         $this->credited_at = Carbon::make($data['credited_at'] ?? null);
     }
 }

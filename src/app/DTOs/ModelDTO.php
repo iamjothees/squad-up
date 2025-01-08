@@ -11,9 +11,10 @@ abstract class ModelDTO
 
     abstract public function toArray(): array;
     abstract public function toCreateArray(): array;
+    abstract public function toUpdateArray(): array;
     abstract public function toModel(): ?Model;
 
-    abstract public function refresh(): self;
+    abstract public function refreshModel(): self;
 
     abstract protected function fill(array $data): void;
 }

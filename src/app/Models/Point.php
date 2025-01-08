@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-#[ObservedBy(PointObserver::class)]
+// #[ObservedBy(PointObserver::class)]
 class Point extends Model
 {
     use HasFactory;

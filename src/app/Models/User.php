@@ -60,6 +60,10 @@ class User extends Authenticatable implements FilamentUser
             ->whereNull('model_has_roles.role_id');
     }
 
+    public function nonCreditedPoints(){
+        return $this->points()->nonCredited()->sum('points');
+    }
+
     public function referedRequirements(){
         return $this->hasMany(Requirement::class, 'referer_id');
     }
@@ -80,7 +84,7 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(PointRedeem::class, 'owner_id');
     }
 
-    public function getSignUpBonusInAmount(): int{
+    public function getSignUpBonusInAmount(): float{
         $settings = app(GeneralSettings::class);
         return $settings->signup_bonus_points
             ? $settings->signup_bonus_points / $settings->point_per_amount

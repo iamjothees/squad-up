@@ -1,7 +1,7 @@
 @assets() @vite(['resources/js/app.js']) @endassets
 <x-filament-panels::page>
     <div 
-        x-on:click="$clipboard('hello world')"
+        x-on:click="$clipboard(`${$wire.get('user')->referal_partner_code}`)"
         class="max-w-96 aspect-square mx-auto cursor-pointer" 
     >
         <img x-data="qrCodeComponent" class="w-full"></img>
@@ -16,7 +16,7 @@
     <script>
         Alpine.data('qrCodeComponent', () => ({
             init(){
-                const referalPartnerCode = "{{ auth()->user()->referal_partner_code }}";
+                const referalPartnerCode = "{{ $user->referal_partner_code }}";
 
                 var typeNumber = 4;
                 var errorCorrectionLevel = 'L';

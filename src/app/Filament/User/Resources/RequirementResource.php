@@ -20,7 +20,7 @@ class RequirementResource extends Resource
     protected static ?string $navigationIcon = 'icon-requirements';
     protected static ?int $navigationSort = 4;
     protected static ?string $navigationGroup = 'Requirements';
-    protected static ?string $navigationLabel = 'Owned';
+    protected static ?string $navigationLabel = 'Own';
 
     public static function getNavigationItems(): array
     {

@@ -4,23 +4,27 @@ namespace App\Models;
 
 use App\Casts\MoneyCast;
 use App\Enums\RequirementStatus;
-use App\Interfaces\PointGeneratorUsingConfig;
-use App\Observers\RequirementObserver;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use App\Interfaces\Referenceable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[ObservedBy([RequirementObserver::class])]
-class Requirement extends Model implements PointGeneratorUsingConfig
+class Requirement extends Model implements Referenceable
 {
     use HasFactory, SoftDeletes;
 
     protected $casts = [
         'required_at' => 'datetime',
-        'expecting_budget' => MoneyCast::class,
+        'budget' => MoneyCast::class,
         'status' => RequirementStatus::class
     ];
+
+    protected $appends = [ 'referer_id' ];
+
+    public function getRefererIdAttribute(): ?int{
+        return $this->reference?->referer_id;
+    }
 
     public function service(){
         return $this->belongsTo(Service::class);
@@ -38,20 +42,12 @@ class Requirement extends Model implements PointGeneratorUsingConfig
         return $this->belongsTo(Project::class);
     }
 
-    public function reference(){
-        return $this->belongsTo(Reference::class);
-    }
-
-    public function pointGeneration(){
-        return $this->morphOne(PointGeneration::class, 'generator');
+    public function reference(): MorphOne{
+        return $this->morphOne(Reference::class, 'referenceable');
     }
 
     public function getAmountforPointCalculation(): float{
-        return $this->expecting_budget;
-    }
-
-    public function getPointOwnerId(): ?int{
-        return $this->reference?->referer_id;
+        return $this->budget;
     }
 
 }

@@ -2,15 +2,29 @@
 
 namespace App\Models;
 
+use App\Interfaces\PointGeneratorUsingConfig;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Reference extends Model
+class Reference extends Model implements PointGeneratorUsingConfig
 {
     use HasFactory;
 
     public $timestamps = false;
-    protected $casts = [
-        'calc_config' => 'array',
-    ];
+
+    public function referenceable(){
+        return $this->morphTo();
+    }
+
+    public function referer(){
+        return $this->belongsTo(User::class, 'referer_id');
+    }
+
+    public function pointGeneration(){
+        return $this->morphOne(PointGeneration::class, 'generator');
+    }
+
+    public function getAmountforPointCalculation(): float{
+        return $this->referenceable->getAmountForPointCalculation();
+    }
 }

@@ -25,7 +25,7 @@ class UserDTO extends ModelDTO implements PointGeneratorDTO
         //
     }
 
-    public function getPointsToGenerateInAmount(): int{
+    public function getPointsToGenerateInAmount(): float{
         return $this->toModel()->getSignUpBonusInAmount();
     }
 
@@ -38,8 +38,8 @@ class UserDTO extends ModelDTO implements PointGeneratorDTO
         $validator = Validator::make($data, [
             'id' => ['nullable', 'exists:users,id'],
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required_if:phone,null', 'string', 'email', 'max:255', 'unique:users,email,' . $data['id']],
-            'phone' => ['required_if:email,null', 'string', 'max:255', 'unique:users,phone,' . $data['id']],
+            'email' => ['required_if:phone,null', 'nullable', 'email', 'max:255', 'unique:users,email,' . $data['id']],
+            'phone' => ['required_if:email,null', 'nullable', 'max:255', 'unique:users,phone,' . $data['id']],
             'password' => ['required', 'string', 'min:8'],
             'current_points' => ['nullable', 'numeric', 'min:0'],
         ]);

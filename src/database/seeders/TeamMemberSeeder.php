@@ -38,7 +38,7 @@ class TeamMemberSeeder extends Seeder
         User::create([
             'name' => 'Sasikumar M',
             'email' => 'sasikumar@gmail.com',
-            'email' => '+919025382009',
+            'phone' => '+919025382009',
             'password' => Hash::make('admin@123'),
             'referal_partner_code' => 'RPC-SAS-2009',
         ])->assignRole('team-member');

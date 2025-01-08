@@ -2,27 +2,22 @@
 
 namespace App\Filament\User\Resources\RequirementResource\Pages;
 
+use App\DTOs\RequirementDTO;
 use App\Filament\User\Resources\RequirementResource;
-use App\Models\User;
-use Filament\Actions;
+use App\Models\Requirement;
+use App\Services\RequirementService;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateRequirement extends CreateRecord
 {
     protected static string $resource = RequirementResource::class;
 
-    protected function mutateFormDataBeforeCreate(array $data): array
+    protected function handleRecordCreation(array $data): Requirement
     {
-        
         $data['owner_id'] = auth()->id();
         
-        if (isset($data['referal_partner_code'])) {
-            $data['referer_id'] = User::where('referal_partner_code', $data['referal_partner_code'])->first()?->id;
-            unset($data['referal_partner_code']);
-        }
-    
-        return $data;
+        $requirementDTO = app(RequirementService::class)->createRequirement(RequirementDTO::fromArray($data));
+        return $requirementDTO->toModel();
     }
-
 
 }
