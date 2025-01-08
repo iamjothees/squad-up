@@ -16,7 +16,7 @@ class PointRedeemDTO extends ModelDTO
     public ?int $id;
     public int $owner_id;
     public int $points;
-    public Carbon $redeemed_at;
+    public ?Carbon $redeemed_at;
 
     public function __construct()
     {
@@ -38,6 +38,6 @@ class PointRedeemDTO extends ModelDTO
         $this->id = $data['id'] ?? null;
         $this->owner_id = $data['owner_id'];
         $this->points = $data['points'];
-        $this->redeemed_at = $data['redeemed_at'] ? Carbon::parse($data['redeemed_at']) : null;
+        $this->redeemed_at = $data['redeemed_at'] ?? null ? Carbon::parse($data['redeemed_at']) : null;
     }
 }

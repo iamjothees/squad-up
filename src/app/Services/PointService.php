@@ -14,6 +14,7 @@ use App\Models\User;
 use App\PointConfig;
 use App\Settings\GeneralSettings;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class PointService
@@ -66,30 +67,50 @@ class PointService
         $pointGenerationDTO->toModel()->delete();
     }
 
-    public function requestForRedeem( UserDTO $userDTO, int $pointsQuantity ): void{
+    public function requestForRedeem( UserDTO $userDTO, int $points ): PointRedeemDTO{
+
+        // Validations for first redeem
+        if ( 
+            !$userDTO->toModel()->redeems  // is first request
+            && !$userDTO->toModel()->points()->credited()->whereNot( 'generation_area', GenerationArea::SIGNUP)->exists() // does have any other point generation other thsn signup
+        ) throw new Exception("First redeem request validations not meet up");
+
+        // Other validations
         $validator = Validator::make(
             data: [
                 'user' => $userDTO->toArray(),
-                'points_quantity' => $pointsQuantity
+                'points' => $points
             ], 
             rules:[
-                'points_quantity' => [
-                    'lte:user.points', "min:{$this->generalSettings->least_redeemable_point}",
+                'points' => [
+                    'lte:user.current_points', "gte:{$this->generalSettings->least_redeemable_point}",
                     fn ($attribute, $value, $fail) => (($value % $this->generalSettings->points_redeem_interval) !== 0) ? $fail("{$attribute} must be multiple of {$this->generalSettings->points_redeem_interval}") : null
                 ], 
             ],
             attributes: [
-                'user.points' => 'User points',
-                'points_quantity' => 'Points quantity'
+                'user.current_points' => 'User points',
+                'points' => 'Requested Points'
             ]
         );
 
         if ($validator->fails()) throw new Exception($validator->errors()->first());
 
-        PointRedeem::create([
-            'owner_id' => $userDTO->id,
-            'points' => $pointsQuantity,            
-        ]);
+        $pointRedeem = DB::transaction(
+            function () use ($userDTO, $points){
+                $pointRedeem = PointRedeem::create([
+                    'owner_id' => $userDTO->id,
+                    'points' => $points,            
+                ]);
+
+                $userDTO->current_points -= $points;
+                $userDTO->toModel()->save();
+
+                return $pointRedeem;
+            }
+        );
+
+
+        return PointRedeemDTO::fromModel($pointRedeem);
     }
 
     public function redeem( PointRedeemDTO $pointRedeemDTO ): void {

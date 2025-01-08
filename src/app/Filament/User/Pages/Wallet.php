@@ -2,9 +2,12 @@
 
 namespace App\Filament\User\Pages;
 
+use App\DTOs\UserDTO;
+use App\Services\PointService;
+use App\Settings\GeneralSettings;
+use Filament\Actions\Action;
+use Filament\Forms\Components\TextInput;
 use Filament\Pages\Page;
-use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Support\HtmlString;
 
 class Wallet extends Page
 {
@@ -16,14 +19,23 @@ class Wallet extends Page
 
     protected static ?int $navigationSort = 1;
 
-    public function getHeading(): string|Htmlable
-{
-    return new HtmlString("
-        <div class='flex flex-row justify-between align-top'>
-            <h1 class='text-2xl font-bold text-gray-900 dark:text-white'>Wallet ABC</h1>
-            <livewire:users.current-points-card :user='".auth()->user()."' />
-        </div>
-    ");
-}
+
+    public function requestToRedeemAction(): Action
+    {
+        $pointService = app(PointService::class);
+        $settings = app(GeneralSettings::class);
+        return Action::make('requestToRedeem')
+            ->form([
+                TextInput::make('points')
+                        ->numeric()
+                        ->minValue($settings->least_redeemable_point)
+                        ->default(auth()->user()->current_points)
+            ])
+            ->modalWidth('sm')
+            ->extraAttributes(['class' => 'w-full'])
+            ->action(
+                fn (array $data) => $pointService->requestForRedeem(userDTO: UserDTO::fromModel(auth()->user()), points: $data['points'] ));
+    }
+
     
 }
