@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->foreignId('service_id')->constrained('services');
+            $table->foreignId('owner_id')->constrained('users');
             $table->foreignId('admin_id')->constrained('users');
             $table->timestamp('start_at')->nullable();
             $table->timestamp('completion_at')->nullable();

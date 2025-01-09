@@ -6,6 +6,7 @@ use App\DTOs\PointGenerationDTO;
 use App\DTOs\ReferenceDTO;
 use App\Enums\Point\GenerationArea;
 use App\Interfaces\PointGeneratorDTO;
+use App\Interfaces\ReferenceableDTO;
 use App\Models\Point;
 use App\Models\Reference;
 
@@ -31,5 +32,14 @@ class ReferenceService
         $reference = $referenceDTO->toModel();
         $this->pointService->destroy( pointGenerationDTO: PointGenerationDTO::fromModel($reference->pointGeneration) );
         $reference->delete();
+    }
+
+    public function handleReferenceableRejected( ReferenceableDTO $referenceableDTO ): void{
+        $reference = Reference::query()
+                        ->where('referenceable_type', $referenceableDTO->getReferenceableType())
+                        ->where('referenceable_id', $referenceableDTO->id)
+                        ->sole();
+
+        $this->pointService->destroy( pointGenerationDTO: PointGenerationDTO::fromModel($reference->pointGeneration) );
     }
 }

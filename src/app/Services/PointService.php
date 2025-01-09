@@ -69,7 +69,6 @@ class PointService
 
     public function requestForRedeem( UserDTO $userDTO, int $points ): PointRedeemDTO{
         // Validations for first redeem
-        // dd($userDTO->toModel()->points()->credited()->whereNot( 'generation_area', GenerationArea::SIGNUP)->exists());
         if ( 
             $userDTO->toModel()->redeems->empty()  // is first request
             && 
@@ -100,10 +99,7 @@ class PointService
 
         $pointRedeem = DB::transaction(
             function () use ($userDTO, $points){
-                $pointRedeem = PointRedeem::create([
-                    'owner_id' => $userDTO->id,
-                    'points' => $points,            
-                ]);
+                $pointRedeem = PointRedeem::create([ 'owner_id' => $userDTO->id, 'points' => $points, ]);
 
                 $userDTO->toModel()->current_points -= $points;
                 $userDTO->toModel()->save();
@@ -112,6 +108,7 @@ class PointService
             }
         );
 
+        SyncUserPoints::dispatch( userDTOs: collect()->push( $userDTO ) );
 
         return PointRedeemDTO::fromModel($pointRedeem);
     }
@@ -135,7 +132,6 @@ class PointService
         $user = $userDTO->toModel();
         $creditedPoints = (int) $user->points()->credited()->sum('points');
         $redeemedPoints = (int) $user->redeems()->sum('points');
-        
         return $creditedPoints - $redeemedPoints;
     }
 

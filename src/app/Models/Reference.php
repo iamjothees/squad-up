@@ -16,6 +16,14 @@ class Reference extends Model implements PointGeneratorUsingConfig
         return $this->morphTo();
     }
 
+    public function convertedReferenceable(){
+        return $this->referenceable()->convertedForReference();
+    }
+
+    public function pendingConversionReferenceable(){
+        return $this->referenceable()->pendingConversionForReference();
+    }
+
     public function referer(){
         return $this->belongsTo(User::class, 'referer_id');
     }

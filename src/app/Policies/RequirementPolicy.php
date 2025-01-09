@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Enums\RequirementStatus;
 use App\Models\Requirement;
 use App\Models\User;
+use Filament\Facades\Filament;
 use Illuminate\Auth\Access\Response;
 
 class RequirementPolicy
@@ -38,7 +39,14 @@ class RequirementPolicy
      */
     public function update(User $user, Requirement $requirement): bool
     {
-        return $requirement->status === RequirementStatus::PENDING && ($user->id === $requirement->admin_id || $user->id === $requirement->owner_id);
+        if ($requirement->status !== RequirementStatus::PENDING) return false; // To be moved to visibility restrictions
+
+        switch (Filament::getCurrentPanel()->getId()) {
+            case 'user': if ($requirement->owner_id !== $user->id) return false; break;
+            case 'admin': if ($requirement->admin_id !== $user->id) return false; break;
+            default: if (($requirement->owner_id !== $user->id) && ($requirement->admin_id !== $user->id)) return false;
+        }
+        return true;
     }
 
     /**
@@ -67,7 +75,15 @@ class RequirementPolicy
 
     public function acceptRequirement(User $user, Requirement $requirement): bool
     {
-        return $requirement->status === RequirementStatus::PENDING && (!$requirement->admin_id || $user->id === $requirement->admin_id);
+        if ($requirement->status !== RequirementStatus::PENDING) return false;
+
+        if ($user->hasRole('admin')) return true; // TO be moved to global permission provider
+
+        if (!$user->hasRole('team-member')) return false;
+
+        if ($requirement->admin_id && ($requirement->admin_id !== $user->id)) return false;
+
+        return false;
     }
 
     public function rejectRequirement(User $user, Requirement $requirement): bool
@@ -77,6 +93,8 @@ class RequirementPolicy
 
     public function createProject(User $user, Requirement $requirement): bool
     {
-        return (!$requirement->project) && $user->id === $requirement->admin_id && in_array($requirement->status, [RequirementStatus::PENDING, RequirementStatus::IN_PROGRESS]);
+        if ($requirement->project) return false;
+        if ($user->hasRole('admin')) return true; // TO be moved to global permission provider
+        return $user->id === $requirement->admin_id && in_array($requirement->status, [RequirementStatus::PENDING, RequirementStatus::IN_PROGRESS]);
     }
 }

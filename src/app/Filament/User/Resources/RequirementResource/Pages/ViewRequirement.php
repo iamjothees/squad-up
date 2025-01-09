@@ -6,6 +6,7 @@ use App\Filament\User\Resources\RequirementResource;
 use App\Models\User;
 use App\Services\RequirementService;
 use Filament\Actions;
+use Filament\Facades\Filament;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewRequirement extends ViewRecord

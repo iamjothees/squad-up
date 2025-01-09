@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Enums\Point\GenerationArea;
 use App\Observers\UserObserver;
 use App\Settings\GeneralSettings;
 use Filament\Models\Contracts\FilamentUser;
@@ -82,6 +83,10 @@ class User extends Authenticatable implements FilamentUser
 
     public function redeems(){
         return $this->hasMany(PointRedeem::class, 'owner_id');
+    }
+
+    public function hasEarnedPoints(): bool{
+        return $this->points()->credited()->whereNot('generation_area', GenerationArea::SIGNUP)->exists();
     }
 
     public function getSignUpBonusInAmount(): float{

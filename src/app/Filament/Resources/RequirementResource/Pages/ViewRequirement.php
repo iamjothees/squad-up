@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\RequirementResource\Pages;
 
+use App\DTOs\RequirementDTO;
 use App\Enums\RequirementStatus;
 use App\Filament\Resources\ProjectResource;
 use App\Filament\Resources\RequirementResource;
@@ -9,8 +10,10 @@ use App\Models\Requirement;
 use App\Services\RequirementService;
 use Closure;
 use Filament\Actions;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Support\Number;
 
 class ViewRequirement extends ViewRecord
 {
@@ -22,17 +25,17 @@ class ViewRequirement extends ViewRecord
     public function __construct()
     {
         $this->handleAccept = function ($record, RequirementService $requirementService) {
-            $requirementService->accept( requirement: $record);
+            $requirementService->accept( requirementDTO: RequirementDTO::fromModel($record) );
             Notification::make('accepted')->title('Accepted')->warning()->send();
         };
 
         $this->handleReject = function ($record, RequirementService $requirementService) {
-            $requirementService->reject( requirement: $record);
+            $requirementService->reject(  requirementDTO: RequirementDTO::fromModel($record) );
             Notification::make('rejected')->title('Rejected')->warning()->send();
         };
 
-        $this->createProject = function ($record, RequirementService $requirementService) {
-            $requirementService->createProject( requirement: $record);
+        $this->createProject = function ($record, RequirementService $requirementService, array $data) {
+            $requirementService->createProject( requirementDTO: RequirementDTO::fromModel($record), initialPayment: $data['initial_payment'] );
             $record->refresh();
             Notification::make('project-created')->title('Project Created')->success()->send();
         };
@@ -46,6 +49,16 @@ class ViewRequirement extends ViewRecord
                 ->color('primary')
                 ->visible(fn (Requirement $record) => $record->project),
             Actions\Action::make('create-project') // TODO: confirm project budget
+                ->form([
+                    TextInput::make('initial_payment')
+                        ->prefix('₹')
+                        ->numeric()
+                        ->hint((fn (Requirement $record) => 'Minimum amount: ' .  Number::currency($record->budget / 2)))
+                        ->default(fn (Requirement $record) => $record->budget)
+                        ->minValue(fn (Requirement $record) => $record->budget / 2)
+
+                ])
+                ->modalWidth('sm')
                 ->action($this->createProject)
                 ->color('success')
                 ->outlined()

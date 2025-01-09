@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Users;
 
+use App\DTOs\UserDTO;
 use App\Models\User;
 use App\Services\UserService;
 use Filament\Notifications\Notification;
@@ -13,9 +14,11 @@ class CurrentPointsCard extends Component
     public User $user;
 
     public int $points = 0;
+    public string $description = "Can be withdrawn at any time";
 
 
     public function mount(){
+        if (!$this->user->hasEarnedPoints()) $this->description = "Start withdrawing points by earning some!";
         $this->points = $this->user->current_points;
         cache([ 'manualRefreshCount' => 0 ]);
     }
@@ -35,11 +38,15 @@ class CurrentPointsCard extends Component
             return;
         }
 
-        $points = app(UserService::class)->getCurrentPoints(user: $this->user);
+        $points = app(UserService::class)->getCurrentPoints(userDTO: UserDTO::fromModel($this->user));
         if ( $points === $this->points ) return;
 
         $this->user->current_points = $points;
         $this->user->push();
-        $this->points = $points;
+
+        $this->redirect(route('filament.user.pages.wallet'), true);
+
+        // $this->description = ($this->user->refresh()->hasEarnedPoints()) ? "Can be withdrawn at any time" : "Start withdrawing points by earning some!";
+        // $this->points = $points;
     }
 }

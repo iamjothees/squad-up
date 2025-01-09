@@ -16,6 +16,7 @@ return new class extends Migration
             $table->morphs('referenceable');
             $table->foreignId('referer_id')->nullable()->constrained('users');
             $table->unsignedTinyInteger('participation_level')->default(1);
+            $table->softDeletes();
         });
     }
 

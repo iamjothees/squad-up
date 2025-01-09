@@ -2,13 +2,14 @@
 
 namespace App\Services;
 
+use App\DTOs\ProjectDTO;
 use App\DTOs\ReferenceDTO;
 use App\DTOs\RequirementDTO;
 use App\Enums\RequirementStatus;
+use App\Interfaces\Referenceable;
 use App\Models\Project;
 use App\Models\Requirement;
 use App\Models\User;
-use App\Settings\GeneralSettings;
 
 //
 use Filament\Facades\Filament;
@@ -27,7 +28,7 @@ use Nette\Utils\Html;
 
 class RequirementService
 {
-    public function __construct(  private PointService $pointService, private GeneralSettings $generalSettings, private ReferenceService $referenceService )
+    public function __construct( private ReferenceService $referenceService, private ProjectService $projectService )
     {
         //
     }
@@ -77,58 +78,59 @@ class RequirementService
         return "REQ-".str($requirementDTO->id)->padLeft(4, '0')."-" . str(str()->uuid())->take(4)->upper();
     }
 
-    public function accept(Requirement $requirement): Requirement{
-        if ($requirement->status !== RequirementStatus::PENDING) throw new \Exception("Can't accept processed Requirement");
 
+
+    public function accept(RequirementDTO $requirementDTO): RequirementDTO{
+        if ($requirementDTO->status !== RequirementStatus::PENDING) throw new \Exception("Can't accept processed Requirement");
+
+        $requirement = $requirementDTO->toModel();
         $requirement->status = RequirementStatus::IN_PROGRESS;
         $requirement->admin_id = auth()->id();
         $requirement->save();
-
-        return $requirement;    
+        return RequirementDTO::fromModel($requirement);
     }
 
-    public function reject(Requirement $requirement): Requirement{
-        if ($requirement->status !== RequirementStatus::PENDING) throw new \Exception("Can't reject processed Requirement");
+    public function reject(RequirementDTO $requirementDTO): RequirementDTO{
+        if ($requirementDTO->status !== RequirementStatus::PENDING) throw new \Exception("Can't reject processed Requirement");
 
-        $requirement->status = RequirementStatus::REJECTED;
-        $requirement->save();
-
-        // app(PointService::class)->destroyPoints(requirement: $requirement);
-
-        return $requirement;    
+        return DB::transaction(function () use ($requirementDTO): RequirementDTO {
+            $requirement = $requirementDTO->toModel();
+            $requirement->status = RequirementStatus::REJECTED;
+            $requirement->save();
+    
+            if ($requirement->reference) $this->referenceService->handleReferenceableRejected(referenceableDTO: RequirementDTO::fromModel($requirement));
+    
+            return $requirementDTO;
+        });
     }
 
-    public function createProject(Requirement $requirement): Project{
-        $project = Project::create([
-            'title' => $requirement->title,
-            'description' => $requirement->description,
-            'service_id' => $requirement->service_id,
-            'admin_id' => $requirement->admin_id,
-            'committed_budget' => $requirement->expecting_budget,
+    public function createProject(RequirementDTO $requirementDTO, float $initialPayment, ): ProjectDTO{
+
+        if ($requirementDTO->status === RequirementStatus::REJECTED) throw new \Exception("Can't create project from rejected Requirement");
+
+        if ($requirementDTO->status === RequirementStatus::APPROVED) throw new \Exception("Can't create another project from approved Requirement"); 
+
+        if ($requirementDTO->status === RequirementStatus::PENDING) $requirementDTO = $this->accept(requirementDTO: $requirementDTO);
+
+        $projectDTO = ProjectDTO::fromArray([
+            'title' => $requirementDTO->title,
+            'description' => $requirementDTO->description,
+            'service_id' => $requirementDTO->service_id,
+            'owner_id' => $requirementDTO->owner_id,
+            'admin_id' => $requirementDTO->admin_id,
+            'committed_budget' => $requirementDTO->budget,
+            'initial_payment' => $initialPayment,
         ]);
-        $requirement->project_id = $project->id;
-        $requirement->status = RequirementStatus::APPROVED;
-        $requirement->save();
 
-        // crediting points through observer
+        $projectDTO = $this->projectService->createProject(projectDTO: $projectDTO, requirementDTO: $requirementDTO);
+
+        $requirement = $requirementDTO->toModel();
+        $requirement->status = RequirementStatus::APPROVED; 
+        $requirement->save();
 
         // Notify owner
 
-        return $project;
-    }
-
-    private function handleReference(Requirement $requirement, RequirementDTO $requirementDTO){
-        if ($requirement->reference){
-            $requirement->reference->delete();
-        }
-
-        if ($requirementDTO->referer_id){
-            $referenceDTO = ReferenceDTO::fromArray([
-                'referenceable' => $requirement,
-                'referer_id' => $requirementDTO->referer_id,
-            ]);
-            app(ReferenceService::class)->createReference(referenceDTO: $referenceDTO, hasPoints: true);
-        }
+        return $projectDTO;
     }
 
 
@@ -159,7 +161,13 @@ class RequirementService
                 ->required()
                 ->preload(config('app.env') === 'local')
                 ->searchable()
-                ->visible(fn ($state) => auth()->id() != $state),
+                ->visible(
+                    fn ($state, $operation) => 
+                        match (Filament::getCurrentPanel()->getId()) {
+                            'admin' => true,
+                            'user' => (!in_array($operation, ['create', 'edit'])) && auth()->id() != $state,
+                        }
+                ),
             Forms\Components\Select::make('service_id')
                 ->label('Service')
                 ->relationship('service', 'name', fn (Builder $query) => $query->active())
@@ -188,13 +196,20 @@ class RequirementService
                     Rule::exists('users', 'referal_partner_code')
                             ->where( fn ($q) => $q->whereNot('id', auth()->id()) )
                 ])
+                ->validationMessages([
+                    'not_in' => 'You cannot refer yourself'
+                ])
                 ->visible(Filament::getCurrentPanel()->getId() !== 'admin'),
             Forms\Components\Select::make('referer_id') // TODO: handle reference creation
                 ->label("Referer")
                 ->options(User::pluck('name', 'id'))
-                ->rules([
-                    'not_in:'.auth()->id()
-                ])
+                ->rules( function ($get){
+                    $referersToExclude = collect()->push(auth()->id());
+                    if (!auth()->user()->hasRole('admin')) $referersToExclude->push($get('owner_id'));
+                    return [ 
+                        'not_in:'.$referersToExclude->implode(',')
+                    ];
+                })
                 ->validationMessages([
                     'not_in' => 'You cannot refer yourself'
                 ])
@@ -218,12 +233,12 @@ class RequirementService
                 ->searchable(),
             Tables\Columns\TextColumn::make('owner.name')
                 ->label("Owner")
-                ->description(fn ($record) => Filament::getPanel() === 'admin' ? ($record->owner?->phone ?? $record->owner?->email) : '')
-                ->visible(fn ($record) => auth()->user() != $record?->owner),
+                ->description(fn ($record) => Filament::getCurrentPanel()->getId() === 'admin' ? ($record->owner?->phone ?? $record->owner?->email) : '')
+                ->visible(fn () => Route::currentRouteName() !== 'filament.user.resources.requirements.index'),
             Tables\Columns\TextColumn::make('admin.name')
                 ->label("Known Team member"),
             Tables\Columns\TextColumn::make('reference.referer.name')
-                ->description(fn ($record) => Filament::getPanel() === 'admin' ? ($record->referer?->phone ?? $record->referer?->email) : '')
+                ->description(fn ($record) => Filament::getCurrentPanel()->getId() === 'admin' ? ($record->referer?->phone ?? $record->referer?->email) : '')
                 ->hidden(fn ($record) => $record?->reference?->referer === auth()->user()),
             Tables\Columns\TextColumn::make('expecting_delivery_at')
                 ->label('Expected Delivery Date Time')

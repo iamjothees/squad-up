@@ -16,7 +16,7 @@ class CreateRequirement extends CreateRecord
     {
         $data['owner_id'] = auth()->id();
         
-        $requirementDTO = app(RequirementService::class)->createRequirement(RequirementDTO::fromArray($data));
+        $requirementDTO = app(RequirementService::class)->createRequirement(RequirementDTO::fromFilamentData($data));
         return $requirementDTO->toModel();
     }
 

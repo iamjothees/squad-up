@@ -4,4 +4,6 @@
         <livewire:users.current-points-card :user="auth()->user()" />
         {{ $this->requestToRedeemAction }}
     </div>
+
+    <livewire:users.redeems :user="auth()->user()" />
 </x-filament-panels::page>

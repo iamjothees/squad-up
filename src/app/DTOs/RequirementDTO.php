@@ -3,6 +3,7 @@
 namespace App\DTOs;
 
 use App\Enums\RequirementStatus;
+use App\Interfaces\ReferenceableDTO;
 use App\Models\Requirement;
 use App\Models\User;
 use App\Rules\User\TeamMember;
@@ -11,7 +12,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
-class RequirementDTO extends FilamentResourceDTO
+class RequirementDTO extends FilamentResourceDTO implements ReferenceableDTO
 {
     use InteractsWithFilamentResourceDTO;
 
@@ -59,21 +60,25 @@ class RequirementDTO extends FilamentResourceDTO
         return $this->referer_id ?? $this->toModel()->getPointOwnerId();
     }
 
+    public function getReferenceableType(): string{
+        return app($this->modelType)->getMorphClass();
+    }
+
     protected function fill(array $data): void{
         $Validator = Validator::make($data, [
-            'id' => ['nullable', 'exists:requirements,id'],
+            'id' => ['nullable', 'int', 'exists:requirements,id'],
             'referal_code' => ['nullable', 'string', 'max:255'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'service_id' => ['required', 'exists:services,id'],
-            'owner_id' => ['required', 'exists:users,id'],
+            'service_id' => ['required', 'int', 'exists:services,id'],
+            'owner_id' => ['required', 'int', 'exists:users,id'],
             'admin_id' => ['nullable', new TeamMember],
             'completion_at' => ['nullable', 'date'],
             'budget' => ['required', 'numeric', 'min:0'],
             'status' => ['nullable', Rule::enum(RequirementStatus::class)],
             'project_id' => ['nullable', 'exists:projects,id'],
             
-            'referer_id' => ['nullable', 'prohibits:referal_partner_code', 'exists:users,id'],
+            'referer_id' => ['nullable', 'int', 'prohibits:referal_partner_code', 'exists:users,id'],
             'referal_partner_code' => ['nullable', 'prohibits:referer_id', 'exists:users,referal_partner_code'],
         ],[
             'referer_id.prohibits' => 'You cannot set both referer_id and referal_partner_code',

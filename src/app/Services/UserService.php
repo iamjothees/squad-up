@@ -23,8 +23,8 @@ class UserService
         return $user->points()->nonCredited()->sum('points');
     }
 
-    public function getCurrentPoints(User $user): int{
-        return $user->points()->credited()->sum('points');
+    public function getCurrentPoints(UserDTO $userDTO): int{
+        return $this->pointService->getUserCurrentPoints(userDTO: $userDTO);
     }
 
     public function generateReferalPartnerCode(User $user){
