@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\EditProfile;
 use App\Filament\User\Pages\Auth\Register;
 use App\Filament\User;
 use App\Filament\User\Pages\Auth\Login;
@@ -13,7 +14,6 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
 use Filament\Pages;
-use Filament\Pages\Auth\EditProfile;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -37,7 +37,7 @@ class UserPanelProvider extends PanelProvider
             ->id('user')
             ->login(Login::class)
             ->registration(Register::class)
-            ->profile(EditProfile::class)
+            ->profile(EditProfile::class, isSimple: false)
             ->discoverResources(in: app_path('Filament/User/Resources'), for: 'App\\Filament\\User\\Resources')
             ->discoverPages(in: app_path('Filament/User/Pages'), for: 'App\\Filament\\User\\Pages')
             ->pages([

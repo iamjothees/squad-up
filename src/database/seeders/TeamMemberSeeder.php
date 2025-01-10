@@ -23,7 +23,7 @@ class TeamMemberSeeder extends Seeder
             'name' => 'Gowtham S',
             'email' => 'g83105237@gmail.com',
             'phone' => '+919361291477',
-            'password' => Hash::make('admin@123'),
+            'password' => Hash::make('team@123'),
             'referal_partner_code' => 'RPC-GOW-1477',
         ])->assignRole('team-member');
 
@@ -31,7 +31,7 @@ class TeamMemberSeeder extends Seeder
             'name' => 'Tamilvanan',
             'email' => 'tamil@gmail.com',
             'phone' => '+917339488948',
-            'password' => Hash::make('admin@123'),
+            'password' => Hash::make('team@123'),
             'referal_partner_code' => 'RPC-TAM-2610',
         ])->assignRole('team-member');
 
@@ -39,7 +39,7 @@ class TeamMemberSeeder extends Seeder
             'name' => 'Sasikumar M',
             'email' => 'sasikumar@gmail.com',
             'phone' => '+919025382009',
-            'password' => Hash::make('admin@123'),
+            'password' => Hash::make('team@123'),
             'referal_partner_code' => 'RPC-SAS-2009',
         ])->assignRole('team-member');
     }

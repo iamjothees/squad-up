@@ -15,7 +15,7 @@ class ListRequirements extends ListRecords
     protected static string $resource = RequirementResource::class;
 
     public function getTitle(): string | Htmlable{
-        return 'Owned';
+        return 'Owning';
     }
 
     protected function getHeaderActions(): array
