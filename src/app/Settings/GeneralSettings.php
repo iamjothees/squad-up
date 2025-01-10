@@ -4,10 +4,10 @@ namespace App\Settings;
 
 use Spatie\LaravelSettings\Settings;
 
-class GeneralSettings extends Settings
+class PointsSettings extends Settings
 {
     public array $points_config;
-    
+
     public float $default_point_percent;
 
     public int $point_per_amount;
@@ -20,6 +20,6 @@ class GeneralSettings extends Settings
 
     public static function group(): string
     {
-        return 'general';
+        return 'points';
     }
 }

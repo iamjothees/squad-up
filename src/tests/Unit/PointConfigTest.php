@@ -2,7 +2,7 @@
 
 use App\PointConfig;
 use App\Services\PointService;
-use App\Settings\GeneralSettings;
+use App\Settings\PointsSettings;
 use Mockery\MockInterface;
 
 pest()->extend(Tests\TestCase::class)->group('point-config');
@@ -10,7 +10,7 @@ pest()->extend(Tests\TestCase::class)->group('point-config');
 test('it_gets_percent_for_point_calculations', 
     function (float $amount, int $participationLevel, float $expectedPercent) {
         // Arrange
-        GeneralSettings::fake([
+        PointsSettings::fake([
             'points_config' => [
                 1 => [
                     ['least' => 3500, 'most' => 10000, 'percent' => 3],

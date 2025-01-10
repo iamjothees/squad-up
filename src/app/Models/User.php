@@ -6,7 +6,7 @@ namespace App\Models;
 
 use App\Enums\Point\GenerationArea;
 use App\Observers\UserObserver;
-use App\Settings\GeneralSettings;
+use App\Settings\PointsSettings;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -90,9 +90,9 @@ class User extends Authenticatable implements FilamentUser
     }
 
     public function getSignUpBonusInAmount(): float{
-        $settings = app(GeneralSettings::class);
-        return $settings->signup_bonus_points
-            ? $settings->signup_bonus_points / $settings->point_per_amount
+        $pointsSettings = app(PointsSettings::class);
+        return $pointsSettings->signup_bonus_points
+            ? $pointsSettings->signup_bonus_points / $pointsSettings->point_per_amount
             : 50;
     }
 }

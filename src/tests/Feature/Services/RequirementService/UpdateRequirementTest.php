@@ -7,7 +7,7 @@ use App\Models\Service;
 use App\Models\User;
 use App\PointConfig;
 use App\Services\RequirementService;
-use App\Settings\GeneralSettings;
+use App\Settings\PointsSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 pest()

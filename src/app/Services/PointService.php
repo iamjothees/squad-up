@@ -12,14 +12,14 @@ use App\Models\PointGeneration;
 use App\Models\PointRedeem;
 use App\Models\User;
 use App\PointConfig;
-use App\Settings\GeneralSettings;
+use App\Settings\PointsSettings;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class PointService
 {
-    public function __construct( private PointConfig $pointsConfig, private GeneralSettings $generalSettings )
+    public function __construct( private PointConfig $pointsConfig, private PointsSettings $pointsSettings )
     {
         //
     }
@@ -33,7 +33,7 @@ class PointService
             'generation_area' => $generationArea,
             'generator_type' => $pointGeneratorDTO?->toModel()->getMorphClass(),
             'generator_id' =>  $pointGeneratorDTO?->id,
-            'calc_config' => $this->generalSettings->points_config
+            'calc_config' => $this->pointsSettings->points_config
         ]);
         return PointGenerationDTO::fromModel($pointGeneration);
     }
@@ -85,8 +85,8 @@ class PointService
             ], 
             rules:[
                 'points' => [
-                    'lte:user.current_points', "gte:{$this->generalSettings->least_redeemable_point}",
-                    fn ($attribute, $value, $fail) => (($value % $this->generalSettings->points_redeem_interval) !== 0) ? $fail("{$attribute} must be multiple of {$this->generalSettings->points_redeem_interval}") : null
+                    'lte:user.current_points', "gte:{$this->pointsSettings->least_redeemable_point}",
+                    fn ($attribute, $value, $fail) => (($value % $this->pointsSettings->points_redeem_interval) !== 0) ? $fail("{$attribute} must be multiple of {$this->pointsSettings->points_redeem_interval}") : null
                 ], 
             ],
             attributes: [
@@ -139,6 +139,6 @@ class PointService
         return match($pointGeneratorDTO){
             null => $generationArea->getPointsToGenerateInAmount(),
             default => $pointGeneratorDTO->getPointsToGenerateInAmount()
-        } * $this->generalSettings->point_per_amount;
+        } * $this->pointsSettings->point_per_amount;
     }
 }

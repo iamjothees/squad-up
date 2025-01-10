@@ -1,12 +1,12 @@
 <?php
 
 use App\Services\PointService;
-use App\Settings\GeneralSettings;
+use App\Settings\PointsSettings;
 
 pest()->extends(Tests\TestCase::class, )->group('point-service', 'calculate-points-in-amount');
 test('it_calculates_points_in_amount', function (float $amount, int $participationLevel, float $expectedPointsInAmount) {
     // Arrange
-    GeneralSettings::fake([
+    PointsSettings::fake([
         'points_config' => [
             1 => [
                 ['least' => 3500, 'most' => 10000, 'percent' => 3],

@@ -3,12 +3,12 @@
 namespace App\Observers;
 
 use App\Models\Reference;
-use App\Settings\GeneralSettings;
+use App\Settings\PointsSettings;
 
 class ReferenceObserver
 {
 
-    public function __construct( private GeneralSettings $generalSettings )
+    public function __construct( private PointsSettings $pointsSettings )
     {
         //
     }
@@ -18,7 +18,7 @@ class ReferenceObserver
      */
     public function creating(Reference $reference): void
     {
-        $reference->calc_config = $this->generalSettings->points_config;
+        $reference->calc_config = $this->pointsSettings->points_config;
     }
 
     public function created(Reference $reference): void

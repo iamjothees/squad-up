@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Collection;
 use Spatie\LaravelSettings\Migrations\SettingsMigration;
 
 return new class extends SettingsMigration
@@ -14,11 +13,11 @@ return new class extends SettingsMigration
             ],
         ];
 
-        $this->migrator->add('general.points_config', $config);
-        $this->migrator->add('general.default_point_percent', 2);
-        $this->migrator->add('general.point_per_amount', $pointsPerAmount = 100);
-        $this->migrator->add('general.least_redeemable_point', 50 * $pointsPerAmount);
-        $this->migrator->add('general.points_redeem_interval', 50 * $pointsPerAmount);
-        $this->migrator->add('general.signup_bonus_points', 50 * $pointsPerAmount);
+        $this->migrator->add('points.points_config', $config);
+        $this->migrator->add('points.default_point_percent', 2);
+        $this->migrator->add('points.point_per_amount', $pointsPerAmount = 100);
+        $this->migrator->add('points.least_redeemable_point', 50 * $pointsPerAmount);
+        $this->migrator->add('points.points_redeem_interval', 50 * $pointsPerAmount);
+        $this->migrator->add('points.signup_bonus_points', 50 * $pointsPerAmount);
     }
 };

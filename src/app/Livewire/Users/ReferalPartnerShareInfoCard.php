@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Users;
 
-use App\Settings\GeneralSettings;
+use App\Settings\PointsSettings;
 use CodeWithDennis\SimpleAlert\Components\Infolists\SimpleAlert;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -55,8 +55,8 @@ class ReferalPartnerShareInfoCard extends Component implements HasInfolists, Has
             ->state($this->share_info);
     }
 
-    public function mount(GeneralSettings $settings){
-        $pointsConfig = collect($settings->points_config)
+    public function mount(PointsSettings $pointsSettings){
+        $pointsConfig = collect($pointsSettings->points_config)
                             ->map(
                                 fn ($pointsConfig) => [
                                     'share_percents' =>

@@ -5,7 +5,7 @@ namespace App\Livewire\Users;
 use App\Models\Point;
 use App\Models\PointRedeem;
 use App\Models\User;
-use App\Settings\GeneralSettings;
+use App\Settings\PointsSettings;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -49,7 +49,7 @@ class Redeems extends Component implements HasForms, HasTable
                     ->alignRight(),
                 Tables\Columns\TextColumn::make('points_value')
                     ->label('Withdrawal Amount')
-                    ->state(fn ($record, GeneralSettings $generalSettings) => Number::currency($record->points / $generalSettings->point_per_amount))
+                    ->state(fn ($record, PointsSettings $pointsSettings) => Number::currency($record->points / $pointsSettings->point_per_amount))
                     ->alignRight(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()

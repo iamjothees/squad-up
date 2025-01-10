@@ -16,7 +16,7 @@ use App\Models\Reference;
 use App\Models\Requirement;
 use App\Models\Service;
 use App\Models\User;
-use App\Settings\GeneralSettings;
+use App\Settings\PointsSettings;
 
 dataset(
     'dtosForFromArray',
@@ -55,7 +55,7 @@ dataset(
                 'referenceable_id' => Requirement::factory()->create()->id,
                 'referer_id' => User::factory()->create()->id,
                 'participation_level' => 1,
-                'calc_config' => (new GeneralSettings())->points_config,
+                'calc_config' => (new PointsSettings())->points_config,
             ]
         ],
         [
@@ -65,7 +65,7 @@ dataset(
                 'referenceable_id' => Requirement::factory()->create()->id,
                 'referer_id' => User::factory()->create()->id,
                 'participation_level' => 1,
-                'calc_config' => (new GeneralSettings())->points_config,
+                'calc_config' => (new PointsSettings())->points_config,
             ]
         ],
         [

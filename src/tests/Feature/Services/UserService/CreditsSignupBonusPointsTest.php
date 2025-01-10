@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use App\Settings\GeneralSettings;
+use App\Settings\PointsSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 pest()
@@ -15,5 +15,5 @@ it('credits signup bonus points', function () {
 
     // Assert
     expect($user->current_points)->toBeGreaterThan(0);
-    expect($user->current_points)->toEqual(app(GeneralSettings::class)->signup_bonus_points);
+    expect($user->current_points)->toEqual(app(PointsSettings::class)->signup_bonus_points);
 });
