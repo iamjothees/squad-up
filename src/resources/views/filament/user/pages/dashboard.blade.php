@@ -10,7 +10,7 @@
         &times;
       </button>
       <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-center">
-        Refer projects, earn points, and <span class="underline">cash out your share</span>!
+        Refer projects, earn points, and <a href="{{ route('filament.user.pages.wallet') }}" class="underline">cash out and enjoy your share</a>!
       </h1>
       <p class="mt-4 text-base sm:text-lg text-center">
         It's simple, fun, and rewarding. Start sharing today!
@@ -18,7 +18,12 @@
     </div>
   </div>
   
-      
+  <x-filament::section>
+    <div class="flex items-center gap-2">
+      <x-filament::icon icon="icon-confette" color="#FFD700" class="h-5 w-5" />
+      <span class="text-sm">Your shares will be credited as soon as the project gets the green light.🚀</span>
+    </div>
+  </x-filament::section>
 
-    <livewire:users.referal-partner-share-info-card />
+  <livewire:users.referal-partner-share-info-card />
 </x-filament-panels::page>

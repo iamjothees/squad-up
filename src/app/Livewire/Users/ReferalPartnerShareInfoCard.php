@@ -3,7 +3,6 @@
 namespace App\Livewire\Users;
 
 use App\Settings\PointsSettings;
-use CodeWithDennis\SimpleAlert\Components\Infolists\SimpleAlert;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Infolists\Components\Component as InfolistsComponent;
@@ -14,7 +13,6 @@ use Filament\Infolists\Concerns\InteractsWithInfolists;
 use Filament\Infolists\Contracts\HasInfolists;
 use Filament\Infolists\Infolist;
 use Illuminate\Support\Number;
-use Laravel\Prompts\Key;
 use Livewire\Component;
 
 class ReferalPartnerShareInfoCard extends Component implements HasInfolists, HasForms
@@ -34,10 +32,6 @@ class ReferalPartnerShareInfoCard extends Component implements HasInfolists, Has
         };
         return $infolist
             ->schema([
-                SimpleAlert::make('disclaimer')
-                    ->warning()
-                    ->icon('icon-confette')
-                    ->description('Your shares will be credited as soon as the project gets the green light.🚀'),
                 Section::make('Referal Partner\'s Shares Info')
                     ->schema([
                         RepeatableEntry::make('participation_levels')
