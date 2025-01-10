@@ -20,7 +20,6 @@ class CurrentPointsCard extends Component
     public function mount(){
         if (!$this->user->hasEarnedPoints()) $this->description = "Start withdrawing points by earning some!";
         $this->points = $this->user->current_points;
-        cache([ 'manualRefreshCount' => 0 ]);
     }
 
     public function render()
@@ -34,7 +33,7 @@ class CurrentPointsCard extends Component
         ], now()->addMinutes(3));
 
         if ( cache('manualRefreshCount') > 5 ){
-            Notification::make()->title('Too many refreshes! Waiting for 3 minutes.')->warning()->send();
+            Notification::make()->title('Too many refreshes! Wait for 3 minutes.')->warning()->send();
             return;
         }
 

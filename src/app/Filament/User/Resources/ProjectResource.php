@@ -82,4 +82,9 @@ class ProjectResource extends Resource
             'index' => Pages\ManageProjects::route('/'),
         ];
     }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return Project::query()->where('owner_id', auth()->id());
+    }
 }

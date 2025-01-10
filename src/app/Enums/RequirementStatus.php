@@ -8,4 +8,13 @@ enum RequirementStatus: string
     case IN_PROGRESS = 'in_progress';
     case APPROVED = 'approved';
     case REJECTED = 'rejected';
+
+    public function label(): string{
+        return match($this){
+            self::PENDING => 'Queued',
+            self::IN_PROGRESS => 'Active',
+            self::APPROVED => 'Approved',
+            self::REJECTED => 'Rejected',
+        };
+    }
 }

@@ -39,7 +39,7 @@ class RequirementPolicy
      */
     public function update(User $user, Requirement $requirement): bool
     {
-        if ($requirement->status !== RequirementStatus::PENDING) return false; // To be moved to visibility restrictions
+        if ($requirement->status !== RequirementStatus::PENDING) return false;
 
         switch (Filament::getCurrentPanel()->getId()) {
             case 'user': if ($requirement->owner_id !== $user->id) return false; break;

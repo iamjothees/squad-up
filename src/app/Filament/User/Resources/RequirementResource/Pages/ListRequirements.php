@@ -32,6 +32,8 @@ class ListRequirements extends ListRecords
 
     protected function getTableQuery(): ?Builder
     {
-        return RequirementResource::getEloquentQuery()->where('owner_id', auth()->id());
+        return RequirementResource::getEloquentQuery()
+                ->whereNot('status', RequirementStatus::APPROVED)
+                ->where('owner_id', auth()->id());
     }
 }

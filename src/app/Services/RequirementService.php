@@ -137,7 +137,6 @@ class RequirementService
     // For Filament
     public static function getEloquentQuery(Builder $query): Builder{
         return $query
-            ->whereNot('status', RequirementStatus::APPROVED)
             ->when(
                 Filament::getCurrentPanel()->getId() === 'admin',
                 fn (Builder $query) => $query->where(
@@ -227,6 +226,7 @@ class RequirementService
     }
 
     public static function getTableColumns(): array{
+        $isReferer = fn () => Filament::getCurrentPanel()->getId() === 'user' && Route::currentRouteName() === 'filament.user.resources.requirements.refered';
         return [
             Tables\Columns\TextColumn::make('title')
                 ->description(fn ($record) => $record->service->name)
@@ -252,15 +252,15 @@ class RequirementService
             Tables\Columns\TextColumn::make('reference.pointGeneration.points')
                 ->label("Your share")
                 ->formatStateUsing(
-                    // fn ($state) => "<x-points points='{$state}' />"
+                    // fn ($state) => view('components.points', [ 'points' => $state, 'attributes' => null])
                     fn ($state) => $state
                 )
                 ->alignEnd()
                 ->sortable()
-                ->html()
-                ->visible(
-                    fn () => Filament::getCurrentPanel()->getId() === 'user' && Route::currentRouteName() === 'filament.user.resources.requirements.refered'
-                ),
+                ->visible($isReferer),
+            Tables\Columns\TextColumn::make('status')
+                ->formatStateUsing(fn ($state) => $state->label())
+                ->visible($isReferer),
             Tables\Columns\TextColumn::make('created_at')
                 ->dateTime()
                 ->sortable()

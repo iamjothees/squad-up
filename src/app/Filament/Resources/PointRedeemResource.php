@@ -35,6 +35,20 @@ class PointRedeemResource extends Resource
 
     public static function table(Table $table): Table
     {
+
+        $redeemedAction = Tables\Actions\Action::make('mark-redeemed')
+            ->label('Mark Redeemed')
+            ->visible(fn (PointRedeem $record): bool => $record->redeemed_at == null)
+            ->form([
+                Forms\Components\DateTimePicker::make('redeemed_at')
+                    ->required()
+                    ->seconds(false)
+                    ->default(now()),
+            ])
+            ->action(function (PointRedeem $record) {
+                $record->update(['redeemed_at' => now()]);
+            });
+
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('owner_id')
@@ -44,7 +58,7 @@ class PointRedeemResource extends Resource
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('redeemed_at')
-                    ->dateTime()
+                    ->dateTime('d-m-Y H:i A')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -63,8 +77,7 @@ class PointRedeemResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                $redeemedAction
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -46,7 +46,7 @@ class ReferalPartnerShareInfoCard extends Component implements HasInfolists, Has
                                 KeyValueEntry::make('share_percents')
                                     ->label($renderSharePercentsLabel)
                                     ->keyLabel("Budget Range (₹)")
-                                    ->valueLabel("Share you get (%)")
+                                    ->valueLabel("Share you earn (%)")
                             ])
                         ->grid(2)
                         ->contained(false)

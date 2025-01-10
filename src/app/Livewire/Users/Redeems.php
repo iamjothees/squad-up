@@ -42,7 +42,7 @@ class Redeems extends Component implements HasForms, HasTable
                     ->sortable(),
                 Tables\Columns\TextColumn::make('redeemed_at')
                     ->label('Status')
-                    ->state(fn ($record) => $record->redeemed_at ? 'Redeemed' : 'Pending'),
+                    ->state(fn ($record) => $record->redeemed_at ? 'Cashout' : 'Pending'),
                 Tables\Columns\TextColumn::make('points')
                     ->numeric()
                     ->sortable()

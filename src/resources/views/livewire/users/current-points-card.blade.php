@@ -5,7 +5,6 @@
             <x-filament::icon
                 icon="icon-refresh"
                 wire:click="refreshPoints"
-                wire:poll.30s="refreshPoints"
                 wire:target="refreshPoints"
                 wire:loading.class="animate-spin"
                 class="h-5 w-5 text-gray-500 dark:text-gray-400 cursor-pointer p-0"

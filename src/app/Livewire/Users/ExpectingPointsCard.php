@@ -15,7 +15,7 @@ class ExpectingPointsCard extends Component
 
 
     public function mount(UserService $userService){
-        $this->points = $userService->getExpectingPoints(user: $this->user);
+        $this->points = 500;//$userService->getExpectingPoints(user: $this->user);
     }
 
     public function render()

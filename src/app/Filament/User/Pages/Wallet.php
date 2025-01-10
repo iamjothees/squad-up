@@ -8,6 +8,7 @@ use App\Settings\GeneralSettings;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Actions\Action as FormsAction;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Number;
 
@@ -38,6 +39,7 @@ class Wallet extends Page
                         ->prefix(fn () => $this->formIsAmount ? '₹' : null)
                         ->prefixIcon(fn () => $this->formIsAmount ? null : 'icon-power')
                         ->minValue(fn () => $this->formIsAmount ? $settings->least_redeemable_point / $settings->point_per_amount : $settings->least_redeemable_point)
+                        ->maxValue(fn () => $this->formIsAmount ? auth()->user()->current_points / $settings->point_per_amount : auth()->user()->current_points)
                         ->default( fn () => $this->formIsAmount ? auth()->user()->current_points / $settings->point_per_amount : auth()->user()->current_points)
                         ->hintAction(
                             FormsAction::make('points/amount')
@@ -65,6 +67,10 @@ class Wallet extends Page
                         points: $this->formIsAmount ? $data['points'] * $settings->point_per_amount : $data['points'] 
                     );
                     $this->redirect(route('filament.user.pages.wallet'), true);
+                    Notification::make()
+                        ->title('Request sent successfully')
+                        ->success()
+                        ->send();
                 }
             );
     }
