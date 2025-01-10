@@ -46,7 +46,7 @@ class UserPanelProvider extends PanelProvider
             ->id('user')
             ->login(Login::class)
             ->registration(Register::class)
-            ->profile(EditProfile::class, isSimple: false)
+            ->profile(EditProfile::class)
             ->discoverResources(in: app_path('Filament/User/Resources'), for: 'App\\Filament\\User\\Resources')
             ->discoverPages(in: app_path('Filament/User/Pages'), for: 'App\\Filament\\User\\Pages')
             ->pages([
