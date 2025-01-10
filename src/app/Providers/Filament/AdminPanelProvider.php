@@ -21,15 +21,14 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         $panel = match (config('app.env')) {
-            'local' => $panel->path('admin'),
-            default => $panel->domain('admin.localhost'),
+            'production' => $panel->domain('admin.'.config('app.domain')),
+            default => $panel->path('admin'),
         };
         return $panel
             ->default()

@@ -12,7 +12,13 @@ class ReferedRequirements extends ListRecords
 {
     protected static string $resource = RequirementResource::class;
 
-    public function getTitle(): string | Htmlable{
+    public function getBreadcrumb(): ?string
+    {
+        return null;
+    }
+
+    public function getTitle(): string | Htmlable
+    {
         return 'Refered';
     }
 

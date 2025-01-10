@@ -30,8 +30,8 @@ class UserPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         $panel = match (config('app.env')) {
-            'local' => $panel->path('console'),
-            default => $panel->domain('console.localhost'),
+            'production' => $panel->domain('squadup.'.config('app.domain')),
+            default => $panel->path('squadup'),
         };
         return $panel
             ->id('user')

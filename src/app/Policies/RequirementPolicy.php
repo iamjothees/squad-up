@@ -23,6 +23,11 @@ class RequirementPolicy
      */
     public function view(User $user, Requirement $requirement): bool
     {
+        switch (Filament::getCurrentPanel()->getId()) {
+            case 'user': if ($requirement->owner_id !== $user->id) return false; break;
+            case 'admin': if ($requirement->admin_id !== $user->id) return false; break;
+            default: if (($requirement->owner_id !== $user->id) && ($requirement->admin_id !== $user->id)) return false;
+        }
         return true;
     }
 
