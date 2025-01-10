@@ -2,7 +2,6 @@
 
 use App\DTOs\PointGenerationDTO;
 use App\DTOs\PointRedeemDTO;
-use App\DTOs\RequirementDTO;
 use App\DTOs\UserDTO;
 use App\Enums\Point\GenerationArea;
 use App\Models\PointGeneration;
@@ -23,6 +22,9 @@ it('withdraws points', function (UserDTO $userDTO, int $points) {
         'credited_at' => now()
     ]);
     PointGeneration::create($pointGenerationDTO->toCreateArray());
+    $user = $userDTO->toModel();
+    $user->current_points += $points;
+    $user->push();
     $userDTO->current_points += $points;
 
     $pointService = app(PointService::class);

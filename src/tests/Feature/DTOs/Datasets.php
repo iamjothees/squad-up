@@ -16,7 +16,6 @@ use App\Models\Reference;
 use App\Models\Requirement;
 use App\Models\Service;
 use App\Models\User;
-use App\Settings\PointsSettings;
 
 dataset(
     'dtosForFromArray',
@@ -28,6 +27,7 @@ dataset(
                 'description' => 'Test Description',
                 'service_id' => Service::factory()->create(['status' => ServiceStatus::ACTIVE])->id,
                 'admin_id' => User::factory()->teamMember()->create()->id,
+                'owner_id' => User::factory()->create()->id,
                 'start_at' => now()->addDays(3),
                 'completion_at' => now()->addDays(5),
                 'committed_budget' => 24999.99,
@@ -51,21 +51,19 @@ dataset(
         [
             ReferenceDTO::class,
             fn () => [
-                'referenceable_type' => Requirement::class,
+                'referenceable_type' => app(Requirement::class)->getMorphClass(),
                 'referenceable_id' => Requirement::factory()->create()->id,
                 'referer_id' => User::factory()->create()->id,
                 'participation_level' => 1,
-                'calc_config' => (new PointsSettings())->points_config,
             ]
         ],
         [
             ReferenceDTO::class,
             fn () => [
-                'referenceable_type' => Requirement::class,
+                'referenceable_type' => app(Requirement::class)->getMorphClass(),
                 'referenceable_id' => Requirement::factory()->create()->id,
                 'referer_id' => User::factory()->create()->id,
                 'participation_level' => 1,
-                'calc_config' => (new PointsSettings())->points_config,
             ]
         ],
         [
@@ -87,10 +85,11 @@ dataset(
         [
             PointGenerationDTO::class,
             fn () => [
+                'owner_id' => User::factory()->create()->id,
                 'points' => 100 * 100,
-                'generation_area' => GenerationArea::REQUIREMENT,
-                'generator_type' => Requirement::class,
-                'generator_id' => Requirement::factory()->create()->id,
+                'generation_area' => GenerationArea::REFERENCE,
+                'generator_type' => app(Reference::class)->getMorphClass(),
+                'generator_id' => Reference::factory()->create()->id,
             ]
         ],
         [

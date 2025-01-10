@@ -24,6 +24,7 @@ class ProjectFactory extends Factory
             'description' => fake()->text(100),
             'service_id' => Service::factory()->create()->id,
             'admin_id' => User::factory()->teamMember()->create()->id,
+            'owner_id' => User::factory()->create()->id,
             'start_at' => fake()->date(),
             'completion_at' => fn (array $attributes) => fake()->dateTimeBetween($attributes['start_at'], Carbon::parse($attributes['start_at'])->addMonths(3)),
             'deliver_at' => fn (array $attributes) => fake()->dateTimeBetween($attributes['completion_at'], Carbon::parse($attributes['completion_at'])->addWeek()),
