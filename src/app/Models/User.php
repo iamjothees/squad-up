@@ -45,6 +45,7 @@ class User extends Authenticatable implements FilamentUser
     {
         return [
             'email_verified_at' => 'datetime',
+            'phone_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
@@ -59,6 +60,11 @@ class User extends Authenticatable implements FilamentUser
         return $query
             ->leftJoin('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
             ->whereNull('model_has_roles.role_id');
+    }
+
+    public function getIsVerifiedAttribute(): bool
+    {
+        return (bool) $this->phone_verified_at;
     }
 
     public function nonCreditedPoints(){

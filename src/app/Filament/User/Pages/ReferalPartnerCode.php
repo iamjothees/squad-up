@@ -18,6 +18,8 @@ class ReferalPartnerCode extends Page
 
     public User $user;
 
+    public bool $verifiedUser = false;
+
     public function infolist(Infolist $infolist): Infolist
     {
         return $infolist
@@ -36,5 +38,6 @@ class ReferalPartnerCode extends Page
 
     public function mount(){
         $this->user = auth()->user();
+        $this->verifiedUser = !$this->user->is_verified;
     }
 }

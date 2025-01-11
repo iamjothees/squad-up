@@ -11,11 +11,4 @@ use Illuminate\Contracts\Database\Eloquent\Builder;
 class ManageProjects extends ManageRecords
 {
     protected static string $resource = ProjectResource::class;
-
-    public function getTabs(): array
-    {
-        return [
-            'all' => Tab::make(),
-        ];
-    }
 }

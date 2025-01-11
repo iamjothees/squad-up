@@ -279,7 +279,7 @@ class RequirementService
     public static function getTabs(): array{
         return [
             'queued_for_confirmation' => Tab::make()
-                ->label('Queued for Confirmation')
+                ->label('Queued')
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('status', RequirementStatus::PENDING)),
             'active' => Tab::make()
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('status', RequirementStatus::IN_PROGRESS)),

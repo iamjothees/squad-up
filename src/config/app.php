@@ -127,4 +127,12 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    
+    'admin' => [
+        'name' => env('ADMIN_NAME', 'Admin'),
+        'number' => env('ADMIN_NUMBER', '919999999999'),
+        'whatsapp' => env('ADMIN_WHATSAPP_NUMBER', '919999999999'),
+        'email' => env('ADMIN_EMAIL', 'admin@' . env('APP_DOMAIN', 'localhost')),
+    ],
+
 ];

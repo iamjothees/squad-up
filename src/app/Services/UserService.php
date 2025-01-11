@@ -19,6 +19,12 @@ class UserService
         );
     }
 
+    public function verifyPhone(UserDTO $userDTO): void{
+        $user = $userDTO->toModel();
+        $user->phone_verified_at = now();
+        $user->push();
+    }
+
     public function getExpectingPoints(User $user): int{
         return $user->points()->nonCredited()->sum('points');
     }

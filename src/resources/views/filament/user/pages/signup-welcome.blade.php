@@ -34,15 +34,6 @@
           <livewire:users.referal-partner-share-info-card />
         </div>
       
-        <!-- Gamified Progress Tracker -->
-        <div class="w-full max-w-md bg-gray-800 rounded-lg p-6 shadow-lg text-center">
-          <h4 class="text-lg font-bold mb-3">Your Progress</h4>
-          <div class="bg-gray-700 w-full h-4 rounded-full overflow-hidden">
-            <div class="bg-green-500 h-full w-1/3"></div>
-          </div>
-          <p class="mt-3 text-sm">You’re just getting started—keep referring to reach new milestones!</p>
-        </div>
-      
         <!-- Footer Note -->
         <div class="mt-10 text-center text-gray-400 text-sm">
           Start sharing and earning now. Your squad is counting on you!

@@ -20,8 +20,10 @@
   
   <x-filament::section>
     <div class="flex items-center gap-2">
-      <x-filament::icon icon="icon-confette" color="#FFD700" class="h-5 w-5" />
-      <span class="text-sm">Your shares will be credited as soon as the project gets the green light.🚀</span>
+      <span class="text-sm">
+        <x-filament::icon icon="icon-confette" color="#FFD700" class="h-5 w-5 inline" />
+        Your shares will be credited as soon as the project gets the green light. 🚀
+      </span>
     </div>
   </x-filament::section>
 
