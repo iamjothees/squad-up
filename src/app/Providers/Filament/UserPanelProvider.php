@@ -15,13 +15,15 @@ use Filament\Http\Responses\Auth\Contracts\RegistrationResponse;
 use Filament\Navigation\NavigationItem;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Support\Facades\FilamentView;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-
+use Illuminate\View\View;
 
 class UserPanelProvider extends PanelProvider
 {
@@ -34,6 +36,15 @@ class UserPanelProvider extends PanelProvider
             RegistrationResponse::class,
             \App\Http\Responses\RegisterResponse::class
         );
+
+    }
+    
+    public function boot(): void
+    {
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::BODY_END,
+            fn (): View => view('components.user.contact-admin-fab', ['user' => auth()->user()]),
+        );    
     }
 
     public function panel(Panel $panel): Panel
