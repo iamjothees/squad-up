@@ -16,6 +16,7 @@ class ProjectDTO extends ModelDTO
     private string $modelType = Project::class;
 
     public ?int $id;
+    public ?string $reference_code;
     public string $title;
     public ?string $description;
     public int $service_id;
@@ -56,6 +57,7 @@ class ProjectDTO extends ModelDTO
         $data = $Validator->validated();
 
         $this->id = $data['id'] ?? null;
+        $this->reference_code = $data['id'] ? Project::prefix() . "-{$data['id']}" : null;
         $this->title = $data['title'];
         $this->description = $data['description'] ?? null;
         $this->service_id = $data['service_id'];

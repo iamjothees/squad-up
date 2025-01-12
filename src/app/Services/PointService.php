@@ -11,6 +11,7 @@ use App\Jobs\SyncUserPoints;
 use App\Models\PointGeneration;
 use App\Models\PointRedeem;
 use App\Models\User;
+use App\Notifications\PointsCredited;
 use App\PointConfig;
 use App\Settings\PointsSettings;
 use Exception;
@@ -47,11 +48,14 @@ class PointService
 
         if ($validator->fails()) throw new Exception("Point already credited");
         
-        $pointGenerationDTO->toModel()->credited_at = now();
-        $pointGenerationDTO->toModel()->save();
+        $pointGeneration = $pointGenerationDTO->toModel();
+        $pointGeneration->credited_at = now();
+        $pointGeneration->save();
 
+        // Notify owner
+        $pointGeneration->owner->notify(new PointsCredited(pointGenerationDTO: $pointGenerationDTO));
 
-        $userDTO = UserDTO::fromModel( User::find($pointGenerationDTO->owner_id) );
+        $userDTO = UserDTO::fromModel( $pointGeneration->owner );
         SyncUserPoints::dispatch( userDTOs: collect()->push( $userDTO ) );
     }
 

@@ -3,7 +3,11 @@
 namespace App\DTOs;
 
 use App\Enums\Point\GenerationArea;
+use App\Interfaces\PointGeneratorDTO;
 use App\Models\PointGeneration;
+use App\Models\Reference;
+use App\Models\Requirement;
+use App\Models\User;
 use App\Rules\MorphId;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
@@ -25,6 +29,8 @@ class PointGenerationDTO extends ModelDTO
     public ?int $generator_id;
     public ?array $calc_config;
     public ?Carbon $credited_at;
+
+    public ?PointGeneratorDTO $pointGeneratorDTO;
 
     public function __construct()
     {
@@ -63,5 +69,11 @@ class PointGenerationDTO extends ModelDTO
         $this->generator_id = $data['generator_id'] ?? null;
         $this->calc_config = $data['calc_config'] ?? null;
         $this->credited_at = Carbon::make($data['credited_at'] ?? null);
+
+        $this->pointGeneratorDTO = match($this->generation_area){
+            GenerationArea::SIGNUP => UserDTO::fromModel(User::find($this->generator_id)),
+            GenerationArea::REFERENCE => ReferenceDTO::fromModel(Reference::find($this->generator_id)),
+            default => null
+        };
     }
 }

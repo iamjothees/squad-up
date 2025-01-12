@@ -7,12 +7,14 @@ use App\Filament\User\Pages\Auth\Register;
 use App\Filament\User;
 use App\Filament\User\Pages\Auth\Login;
 use App\Filament\User\Resources\RequirementResource;
+use BetterFuturesStudio\FilamentLocalLogins\LocalLogins;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Http\Responses\Auth\Contracts\RegistrationResponse;
 use Filament\Navigation\NavigationItem;
+use Filament\Notifications\Livewire\DatabaseNotifications;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -34,6 +36,9 @@ class UserPanelProvider extends PanelProvider
             RegistrationResponse::class,
             \App\Http\Responses\RegisterResponse::class
         );
+
+        DatabaseNotifications::trigger('filament.notifications.database-notifications-trigger');
+        DatabaseNotifications::pollingInterval(null);
     }
 
     public function panel(Panel $panel): Panel
@@ -74,6 +79,7 @@ class UserPanelProvider extends PanelProvider
             ->colors([
                 'primary' => '#006600',
             ])
+            ->spa()
             ->topNavigation()
             ->navigationItems([
                 NavigationItem::make('Refered Requirements')
@@ -86,6 +92,7 @@ class UserPanelProvider extends PanelProvider
 
             ])
             ->databaseTransactions()
-            ->viteTheme('resources/css/filament/user/theme.css');
+            ->viteTheme('resources/css/filament/user/theme.css')
+            ->databaseNotifications();
     }
 }

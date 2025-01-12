@@ -5,5 +5,6 @@
 
 # User App Panel
 - Signup verfication
-- Signup welcome screen
 
+# Wallet
+- refresh restriction logic to be moved to frontend

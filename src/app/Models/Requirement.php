@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Casts\MoneyCast;
+use App\DTOs\RequirementDTO;
 use App\Enums\RequirementStatus;
 use App\Interfaces\Referenceable;
 use Illuminate\Contracts\Database\Eloquent\Builder;
@@ -58,6 +59,15 @@ class Requirement extends Model implements Referenceable
 
     public function getAmountforPointCalculation(): float{
         return $this->budget;
+    }
+
+    public static function prefix(): string{
+        return "REQ";
+    }
+
+    public function toDTO(): RequirementDTO
+    {
+        return RequirementDTO::fromModel($this);
     }
 
 }

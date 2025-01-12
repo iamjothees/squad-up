@@ -48,6 +48,10 @@ class UserDTO extends ModelDTO implements PointGeneratorDTO
         return $this->toModel()->id;
     }
 
+    public function getIdentificationReference(): string{
+        return $this->name;
+    }
+
     protected function fill( array $data ): void{
         $data['id'] ??= null;
         $validator = Validator::make($data, [

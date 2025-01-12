@@ -7,6 +7,7 @@ use App\DTOs\ProjectDTO;
 use App\DTOs\RequirementDTO;
 use App\Enums\Point\GenerationArea;
 use App\Models\Project;
+use App\Notifications\RequirementAdvancedToProject;
 
 class ProjectService
 {
@@ -29,7 +30,9 @@ class ProjectService
         if ( $project->requirement?->reference )
             $this->pointService->credit(pointGenerationDTO: PointGenerationDTO::fromModel($project->requirement->reference->pointGeneration));
 
-        // TODO: notify owner
+        // Notify owner
+        $requirement->owner->notify(new RequirementAdvancedToProject(requirementDTO: $requirementDTO));
+        
         return ProjectDTO::fromModel($project);
     }
 }

@@ -64,6 +64,10 @@ class RequirementDTO extends FilamentResourceDTO implements ReferenceableDTO
         return app($this->modelType)->getMorphClass();
     }
 
+    public function getIdentificationReference(): string{
+        return $data['id'] ? Requirement::prefix() . "-{$data['id']}" : null
+    }
+
     protected function fill(array $data): void{
         $Validator = Validator::make($data, [
             'id' => ['nullable', 'int', 'exists:requirements,id'],

@@ -2,6 +2,7 @@
 
 namespace App\Filament\User\Resources;
 
+use App\DTOs\ProjectDTO;
 use App\Filament\User\Resources\ProjectResource\Pages;
 use App\Filament\User\Resources\ProjectResource\RelationManagers;
 use App\Models\Project;
@@ -24,6 +25,10 @@ class ProjectResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->label('Reference ID')
+                    ->formatStateUsing(fn ($record) => ProjectDTO::fromModel($record)->reference_code)
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('service.name')

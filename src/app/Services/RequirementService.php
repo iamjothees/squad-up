@@ -10,7 +10,7 @@ use App\Interfaces\Referenceable;
 use App\Models\Project;
 use App\Models\Requirement;
 use App\Models\User;
-
+use App\Notifications\RequirementAdvancedToProject;
 //
 use Filament\Facades\Filament;
 use Filament\Forms;
@@ -128,8 +128,6 @@ class RequirementService
         $requirement->status = RequirementStatus::APPROVED; 
         $requirement->save();
 
-        // Notify owner
-
         return $projectDTO;
     }
 
@@ -228,6 +226,10 @@ class RequirementService
     public static function getTableColumns(): array{
         $isReferer = fn () => Filament::getCurrentPanel()->getId() === 'user' && Route::currentRouteName() === 'filament.user.resources.requirements.refered';
         return [
+            Tables\Columns\TextColumn::make('id')
+                ->label('Reference ID')
+                ->formatStateUsing(fn ($record) => RequirementDTO::fromModel($record)->reference_code)
+                ->searchable(),
             Tables\Columns\TextColumn::make('title')
                 ->description(fn ($record) => $record->service->name)
                 ->searchable(),

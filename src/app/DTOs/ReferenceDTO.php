@@ -35,6 +35,10 @@ class ReferenceDTO extends ModelDTO implements PointGeneratorDTO
         return $this->referer_id;
     }
 
+    public function getIdentificationReference(): string{
+        return $this->toModel()->id;
+    }
+
     protected function fill(array $data): void{
         $validator =Validator::make($data, [
             'id' => ['nullable', 'exists:references,id'],

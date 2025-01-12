@@ -35,4 +35,8 @@ class Project extends Model
     public function requirement(){
         return $this->hasOne(Requirement::class);
     }
+
+    public static function prefix(): string{
+        return "PROJ";
+    }
 }

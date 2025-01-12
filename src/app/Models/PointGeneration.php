@@ -23,4 +23,8 @@ class PointGeneration extends Model
     public function scopeNonCredited($query){
         return $query->whereNull('credited_at');
     }
+
+    public function owner(){
+        return $this->belongsTo(User::class, 'owner_id');
+    }
 }
