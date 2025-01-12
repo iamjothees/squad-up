@@ -38,6 +38,6 @@ class ReferalPartnerCode extends Page
 
     public function mount(){
         $this->user = auth()->user();
-        $this->verifiedUser = !$this->user->is_verified;
+        $this->verifiedUser = $this->user->is_verified;
     }
 }
