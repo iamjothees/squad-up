@@ -26,13 +26,10 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        $panel = match (config('app.env')) {
-            'production' => $panel->domain('admin.'.config('app.domain')),
-            default => $panel->path('admin'),
-        };
         return $panel
             ->default()
             ->id('admin')
+            ->path('admin')
             ->login()
             ->colors([
                 'primary' => Color::Amber,
