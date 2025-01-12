@@ -5,6 +5,7 @@ namespace App\Services;
 use App\DTOs\UserDTO;
 use App\Enums\Point\GenerationArea;
 use App\Models\User;
+use Exception;
 
 class UserService
 {
@@ -14,6 +15,7 @@ class UserService
     }
 
     public function creditSignupBonusPoints(UserDTO $userDTO): void{
+        if ( $userDTO->toModel()->points()->where('generation_area', GenerationArea::SIGNUP)->exists() ) throw new Exception("User already has signup bonus");
         $this->pointService->credit( 
             pointGenerationDTO: $this->pointService->generate( generationArea: GenerationArea::SIGNUP, pointGeneratorDTO: $userDTO ) 
         );

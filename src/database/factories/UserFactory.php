@@ -18,6 +18,7 @@ class UserFactory extends Factory
     {
         return [
             'name' => fake()->name(),
+            'referal_partner_code' => 'RPC-' . rand(1000, 9999),
             'email' => fake()->unique()->safeEmail(),
             'phone' => fake()->unique()->numerify('+919#########'),
             'email_verified_at' => now(),
