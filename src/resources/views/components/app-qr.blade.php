@@ -4,7 +4,7 @@
     </div>
     <div compact class="p-2">
         <div class="mt-2 flex items-center gap-2">
-            <span class="font-sans font-semibold">{{ config('app.domain') }}</span>
+            <span class="font-sans font-semibold">{{ config('app.url') }}</span>
             <x-filament::icon icon="icon-clipboard" class="h-5 w-5 text-white cursor-pointer" />
         </div>
     </div>
