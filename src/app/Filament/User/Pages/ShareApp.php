@@ -7,7 +7,7 @@ use Filament\Pages\Page;
 class ShareApp extends Page
 {
     protected static ?string $navigationIcon = 'icon-team';
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 5;
 
     protected static string $view = 'filament.user.pages.share-app';
 

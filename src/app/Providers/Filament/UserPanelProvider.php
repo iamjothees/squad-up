@@ -87,13 +87,18 @@ class UserPanelProvider extends PanelProvider
             ])
             ->topNavigation()
             ->navigationItems([
+                NavigationItem::make('new-requirement')
+                    ->label('New Requirement')
+                    ->icon('heroicon-o-plus')
+                    ->url(fn () => RequirementResource::getUrl('create'))
+                    ->isActiveWhen(fn () => request()->routeIs(RequirementResource::getRouteBaseName() . '.create'))
+                    ->sort(3),
                 NavigationItem::make('Refered Requirements')
                     ->label('Refered')
                     ->icon('icon-refered-requirements')
                     ->url(fn () => RequirementResource::getUrl('refered'))
                     ->isActiveWhen(fn () => request()->routeIs(RequirementResource::getRouteBaseName() . '.refered'))
-                    ->group('Requirements')
-                    ->sort(3),
+                    ->group('Requirements'),
 
             ])
             ->databaseTransactions()
