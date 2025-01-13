@@ -18,7 +18,6 @@ class RequirementResource extends Resource
     protected static ?string $model = Requirement::class;
 
     protected static ?string $navigationIcon = 'icon-requirements';
-    protected static ?int $navigationSort = 4;
     protected static ?string $navigationGroup = 'Requirements';
     protected static ?string $navigationLabel = 'Owning';
 
