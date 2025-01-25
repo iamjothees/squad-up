@@ -31,7 +31,7 @@ trait InteractsWithModelDTO
     }
 
     public function toCreateArray(): array{
-        return collect($this->toArray())->except('id')->toArray();
+        return collect($this->toArray())->except('id')->filter(fn ($value) => !is_null($value))->toArray();
     }
 
     public function toUpdateArray(): array{
