@@ -1,5 +1,6 @@
 <?php
 
+use App\DTOs\EnquiryDTO;
 use App\DTOs\PointGenerationDTO;
 use App\DTOs\PointRedeemDTO;
 use App\DTOs\ProjectDTO;
@@ -9,6 +10,7 @@ use App\DTOs\UserDTO;
 use App\Enums\Point\GenerationArea;
 use App\Enums\RequirementStatus;
 use App\Enums\ServiceStatus;
+use App\Models\Enquiry;
 use App\Models\PointGeneration;
 use App\Models\PointRedeem;
 use App\Models\Project;
@@ -99,6 +101,14 @@ dataset(
                 'points' => 100 * 100,
                 'redeemed_at' => now()->subDays(3),
             ]
+        ],
+        [
+            EnquiryDTO::class,
+            fn () => [
+                'enquirer_name' => fake()->name(),
+                'enquirer_contact' => fake()->boolean() ? fake()->phoneNumber() : fake()->email(),
+                'message' => fake()->text(),
+            ]
         ]
     ]
 );
@@ -130,6 +140,10 @@ dataset(
         [
             PointRedeemDTO::class,
             fn () => PointRedeem::factory()->create(),
+        ],
+        [
+            EnquiryDTO::class,
+            fn () => Enquiry::factory()->create(),
         ]
     ]
 );
@@ -151,6 +165,11 @@ dataset(
             UserDTO::class,
             fn () => User::factory()->create(),
             User::class,
+        ],
+        [
+            EnquiryDTO::class,
+            fn () => Enquiry::factory()->create(),
+            Enquiry::class,
         ]
     ]
 );
